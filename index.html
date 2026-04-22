@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <title>ASMRbox</title>
 <style>
+/* =========================
+   PC 共通デザイン
+========================= */
 body {
     font-family: sans-serif;
     margin: 20px;
@@ -90,7 +93,9 @@ body {
     border-radius: 8px;
 }
 
-/* ▼ スマホ最適化（幅600px以下） */
+/* =========================
+   スマホ最適化（幅600px以下）
+========================= */
 @media (max-width: 600px) {
 
     /* 画面全体をスマホ幅に最適化 */
@@ -114,7 +119,9 @@ body {
         padding: 20px;
     }
 
-    #loginArea input {
+    #loginArea input,
+    #loginArea button {
+        display: block;
         width: 100%;
         font-size: 18px;
         padding: 12px;
@@ -122,21 +129,15 @@ body {
         box-sizing: border-box;
     }
 
-    #loginArea button {
-        width: 100%;
-        font-size: 18px;
-        padding: 12px;
-        margin-bottom: 10px;
-    }
-
-    /* ▼ ジャンル欄を1列に */
+    /* ▼ 行ボタンを1列に */
     .row-grid {
-        grid-template-columns: 1fr; /* 行ボタンを1列に */
+        grid-template-columns: 1fr;
         gap: 10px;
     }
 
+    /* ▼ ジャンル欄を1列に */
     .genre-box label {
-        width: 100%; /* ジャンルを1列に */
+        width: 100%;
         display: block;
         padding: 8px 0;
         font-size: 16px;
@@ -183,17 +184,7 @@ body {
         padding: 10px 14px;
         font-size: 16px;
     }
-
-    /*ログイン画面のUIを縦一列にする*/
-    #loginArea input,
-    #loginArea button {
-    display: block;
-    width: 100%;
-    box-sizing: border-box;
-    }
-
 }
-
 </style>
 </head>
 <body>
