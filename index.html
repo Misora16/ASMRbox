@@ -404,11 +404,12 @@ function loadGenres() {
     genreContainer.innerHTML = "";  // ★ 追加
     filter.innerHTML = `<option value="">ジャンル指定なし</option>`; // ★ 追加
 
-        rowButtons.innerHTML += `
-            <div class="row-button" data-row="${row}" onclick="toggleGenre('${id}', '${row}')">
-                ▶ ${row}
-            </div>
-        `;
+       rowButtons.innerHTML += `
+    <div class="row-button" data-row="${row}" onclick="toggleGenre('${id}', '${row}')">
+        <span class="label">${row}</span>
+        <span class="icon">▶</span>
+    </div>
+`;
 
         genreContainer.innerHTML += `
             <div class="row-button" data-row="${row}" onclick="toggleGenre('${id}', '${row}')">
