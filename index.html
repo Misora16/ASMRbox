@@ -258,11 +258,11 @@ function showApp() {
     document.getElementById("appArea").style.display = "block";
 }
 
-auth.onAuthStateChanged(user => {
+auth.onAuthStateChanged(async user => {
     if (user) {
         showApp();
-        loadGenres();      // ← ジャンル生成
-        renderPosts();     // ← 投稿一覧生成
+        loadGenres();
+        await loadFromCloud();   // ← これが絶対必要
     } else {
         showLogin();
     }
@@ -470,15 +470,15 @@ function clearForm() {
     updateSelectedGenres();
 }
 
-function deletePost(index) {
+async function deletePost(index) {
     posts.splice(index, 1);
-    localStorage.setItem("posts", JSON.stringify(posts));
+    await saveToCloud();
     renderPosts();
 }
 
-function toggleFavorite(index) {
+async function toggleFavorite(index) {
     posts[index].favorite = !posts[index].favorite;
-    localStorage.setItem("posts", JSON.stringify(posts));
+    await saveToCloud();
     renderPosts();
 }
 
