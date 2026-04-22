@@ -4,117 +4,148 @@
 <meta charset="UTF-8">
 <title>ASMRbox</title>
 <style>
-/* ======== 全体レイアウト ======== */
 body {
     font-family: sans-serif;
     margin: 20px;
-    background: #fafafa;
+    background: #f5f5f5;
 }
-
 .container {
-    max-width: 900px;
+    max-width: 800px;
     margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
 }
 
-/* ======== 入力フォーム ======== */
-input, select {
-    width: 100%;
-    padding: 8px;
-    margin: 6px 0;
-    box-sizing: border-box;
-}
-
-/* ======== ジャンル選択 UI ======== */
+/* ▼ 行ボタン */
 .row-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
-    gap: 6px;
-    margin: 10px 0;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
 }
-
-.row-grid button {
-    padding: 6px;
-    background: #eee;
-    border: 1px solid #ccc;
+@media (max-width: 600px) {
+    .row-grid { grid-template-columns: 1fr; }
+}
+.row-button {
+    background: #ddd;
+    padding: 10px;
+    border-radius: 5px;
     cursor: pointer;
+    text-align: center;
+    font-weight: bold;
 }
 
+/* ▼ ジャンルボックス */
 .genre-box {
     display: none;
-    padding: 6px;
+    padding: 10px;
+    background: #f8f8f8;
+    border-radius: 5px;
     margin-bottom: 10px;
-    border-left: 3px solid #999;
+}
+.genre-box.open {
+    display: block;
+}
+.genre-box label {
+    display: inline-block;
+    width: 48%;
+    margin-bottom: 5px;
 }
 
-.genre-box button {
-    margin: 4px;
-    padding: 4px 8px;
-    background: #f0f0f0;
-    border: 1px solid #bbb;
+/* ▼ 選択タグ */
+.selected-tags { margin: 10px 0; }
+.tag {
+    display: inline-block;
+    background: #cce5ff;
+    padding: 5px 10px;
+    margin: 3px;
+    border-radius: 5px;
     cursor: pointer;
 }
+.tag:hover { background: #99ccff; }
 
-/* 選択済みタグ */
-.selected-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin: 10px 0;
-}
-
-.selected-tags span {
-    background: #d0f0ff;
-    padding: 4px 8px;
-    border-radius: 4px;
-}
-
-/* ======== 投稿一覧 ======== */
-.post-item {
-    background: white;
-    padding: 12px;
-    margin: 10px 0;
+/* ▼ 投稿カード */
+.post {
+    background: #fff;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 8px;
     border: 1px solid #ddd;
     position: relative;
 }
 
-/* ======== 投稿ボタン（編集・削除・お気に入り） ======== */
-.action-area {
+/* ▼ PC版のボタン位置（右上固定） */
+.action-btn {
     position: absolute;
     top: 6px;
-    right: 6px;
-    display: flex;
-    gap: 6px;
-}
-
-.action-btn {
     width: 26px;
     height: 26px;
     font-size: 14px;
     border: none;
+    border-radius: 6px;
     cursor: pointer;
-    background: #eee;
-}
-
-/* ======== ページネーション ======== */
-.pagination {
+    color: white;
     display: flex;
-    gap: 6px;
+    align-items: center;
+    justify-content: center;
+}
+.fav-btn { right: 72px; background: #ffcc00; color: black; }
+.edit-btn { right: 40px; background: #4da3ff; }
+.delete-btn { right: 8px; background: #ff6666; }
+
+/* ▼ 絞り込み */
+.filter-area {
     margin-top: 20px;
+    padding: 10px;
+    background: #eef;
+    border-radius: 8px;
 }
 
-.pagination button {
-    padding: 6px 10px;
-}
-
-/* ======== スマホ最適化 ======== */
+/* ▼ スマホ最適化 */
 @media (max-width: 600px) {
+
+    .post {
+        padding-top: 10px;
+    }
+
+    /* スマホではボタンをタイトル上に横並び */
     .action-area {
-        position: static;
-        margin-top: 10px;
+        display: flex;
+        flex-direction: row;
         justify-content: flex-end;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .action-btn {
+        position: static;
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+    }
+
+    /* ジャンルラベル1列 */
+    .genre-box label {
+        width: 100%;
+        font-size: 16px;
+        padding: 6px 0;
+    }
+
+    /* 行ボタン大きく */
+    .row-button {
+        padding: 14px;
+        font-size: 18px;
+    }
+
+    /* 追加・保存・キャンセルボタン大きく */
+    #mainBtn,
+    #cancelBtn {
+        font-size: 20px;
+        padding: 14px;
+        width: 100%;
+        margin-top: 10px;
     }
 }
-
 </style>
 </head>
 <body>
