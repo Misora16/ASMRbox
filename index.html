@@ -209,6 +209,8 @@ body {
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
 <!-- ======== すべての JS を 1 つの script に統合 ======== -->
 <script>
 /* ======== Firebase 設定 ======== */
@@ -224,6 +226,8 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
+
+const db = firebase.firestore();
 
 /* ======== ログイン制御 ======== */
 function showLogin() {
