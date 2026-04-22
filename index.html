@@ -437,6 +437,44 @@ function searchGenres() {
     }
 }
 
+function loadGenres() {
+    const rowButtons = document.getElementById("rowButtons");
+    const genreContainer = document.getElementById("genreContainer");
+    const filter = document.getElementById("filterGenre");
+
+    // 初期化
+    rowButtons.innerHTML = "";
+    genreContainer.innerHTML = "";
+    filter.innerHTML = `<option value="">ジャンル指定なし</option>`;
+
+    // 行ごとに生成
+    for (const row in genreGroups) {
+        const id = "box_" + row;
+
+        // 行ボタン（アイコン右側）
+        rowButtons.innerHTML += `
+            <div class="row-button" data-row="${row}" onclick="toggleGenre('${id}', '${row}')">
+                <span class="label">${row}</span>
+                <span class="icon">▶</span>
+            </div>
+        `;
+
+        // ジャンル一覧
+        genreContainer.innerHTML += `
+            <div class="genre-box" id="${id}">
+                ${genreGroups[row].map(g =>
+                    `<label><input type="checkbox" value="${g}" onchange="updateSelectedGenres()">${g}</label>`
+                ).join("")}
+            </div>
+        `;
+
+        // 絞り込み用
+        genreGroups[row].forEach(g => {
+            filter.innerHTML += `<option value="${g}">${g}</option>`;
+        });
+    }
+}
+
 function toggleGenre(id, row) {
     const box = document.getElementById(id);
     const btn = document.querySelector(`.row-button[data-row="${row}"]`);
