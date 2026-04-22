@@ -2,152 +2,11 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ASMRbox</title>
-
 <style>
-/* ======== 基本レイアウト ======== */
-body {
-    font-family: sans-serif;
-    margin: 20px;
-    background: #f5f5f5;
-}
-.container {
-    max-width: 800px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-}
-
-/* ======== 行ボタン ======== */
-.row-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-@media (max-width: 600px) {
-    .row-grid { grid-template-columns: 1fr; }
-}
-.row-button {
-    background: #ddd;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    text-align: center;
-    font-weight: bold;
-}
-
-/* ======== ジャンルボックス ======== */
-.genre-box {
-    display: none;
-    padding: 10px;
-    background: #f8f8f8;
-    border-radius: 5px;
-    margin-bottom: 10px;
-}
-.genre-box.open {
-    display: block;
-}
-.genre-box label {
-    display: inline-block;
-    width: 48%;
-    margin-bottom: 5px;
-}
-
-/* ======== 選択タグ ======== */
-.selected-tags { margin: 10px 0; }
-.tag {
-    display: inline-block;
-    background: #cce5ff;
-    padding: 5px 10px;
-    margin: 3px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-.tag:hover { background: #99ccff; }
-
-/* ======== 投稿カード ======== */
-.post {
-    background: #fff;
-    padding: 15px;
-    margin-top: 15px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    position: relative;
-}
-
-/* ======== PC版のボタン位置 ======== */
-.action-btn {
-    position: absolute;
-    top: 6px;
-    width: 26px;
-    height: 26px;
-    font-size: 14px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.fav-btn { right: 72px; background: #ffcc00; color: black; }
-.edit-btn { right: 40px; background: #4da3ff; }
-.delete-btn { right: 8px; background: #ff6666; }
-
-/* ======== 絞り込み ======== */
-.filter-area {
-    margin-top: 20px;
-    padding: 10px;
-    background: #eef;
-    border-radius: 8px;
-}
-
-/* ======== スマホ最適化 ======== */
-@media (max-width: 600px) {
-
-    .post {
-        padding-top: 10px;
-    }
-
-    .action-area {
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-end;
-        gap: 10px;
-        margin-bottom: 8px;
-    }
-
-    .action-btn {
-        position: static;
-        width: 36px;
-        height: 36px;
-        font-size: 18px;
-    }
-
-    .genre-box label {
-        width: 100%;
-        font-size: 16px;
-        padding: 6px 0;
-    }
-
-    .row-button {
-        padding: 14px;
-        font-size: 18px;
-    }
-
-    #mainBtn,
-    #cancelBtn {
-        font-size: 20px;
-        padding: 14px;
-        width: 100%;
-        margin-top: 10px;
-    }
-}
+/* 必要ならここにあなたの CSS を入れてね */
 </style>
 </head>
-
 <body>
 
 <!-- ======== ログイン画面 ======== -->
@@ -209,7 +68,9 @@ body {
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
+<!-- ======== すべての JS を 1 つの script に統合 ======== -->
 <script>
+/* ======== Firebase 設定 ======== */
 const firebaseConfig = {
   apiKey: "AIzaSyAPSv0fSvoMNPw5Ua95JJjY2pppwwMqcsY",
   authDomain: "asmrbox-69b3a.firebaseapp.com",
@@ -219,11 +80,6 @@ const firebaseConfig = {
   appId: "1:320429813177:web:64f47359ec47e9730a1a68",
   measurementId: "G-47CSW3WD4N"
 };
-
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-<script>
-const firebaseConfig = { … };
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
@@ -260,29 +116,27 @@ function signup() {
 function logout() {
     auth.signOut();
 }
-</script>
 
 /* ======== ASMRbox 本体の JS ======== */
-
 const genreGroups = {
-    "あ行": ["愛重め","甘々","甘やかし","甘サド","姉","イチャイチャ","妹","お姉さん"],
-    "か行": ["彼女","カワボ","環境音","監禁","看病","義姉","義妹","ギャル","共依存","KU100","コラボ"],
-    "さ行": ["シチュボ","実写","囁き","シャンプー","心音","人外","スライム","声なし","声優","全肯定"],
-    "た行": ["タッピング","タイピング","タオルドライ","ダウナー","ツンデレ","低音","吐息","動画","動物","年上","年下"],
-    "な行": ["撫で","認知シャッフル","のじゃロリ"],
-    "は行": ["ハグ","罵倒","ハムボ","膝枕","ペット","ボーイッシュ","僕っ子"],
-    "ま行": ["マッサージ","ママ","耳かき","耳ふさぎ","メンヘラ"],
-    "や行": ["ヤンデレ","百合"],
-    "ら行": ["ライブ配信","リップ音"],
-    "わ行": ["わからせ"]
+  "あ行": ["愛重め","甘々","甘やかし","甘サド","姉","イチャイチャ","妹","お姉さん"],
+  "か行": ["彼女","カワボ","環境音","監禁","看病","護衛","共依存","KU100","コラボ"],
+  "さ行": ["シュチュ","実写","寝","添い寝","心音","人外","スライム","声なし","声優","全肯定"],
+  "た行": ["タッピング","タイピング","タタルドドライ","ダウナー","ツンデレ","低音","吐息","動画","動物","年上","年下"],
+  "な行": ["撫で","認知シャッフル","のじゃロリ"],
+  "は行": ["ハツ","屈倒","ハムボ","膝枕","ペット","ボーイッシュ","僕っ子"],
+  "ま行": ["マッサージ","ママ","耳かき","耳ふさぎ","メンヘラ"],
+  "や行": ["ヤンデレ","百合"],
+  "ら行": ["ライブ配信","リップ音"],
+  "わ行": ["わからせ"]
 };
 
-let posts = JSON.parse(localStorage.getItem("posts") || "[]");
+let posts = JSON.parse(localStorage.getItem("posts")) || [];
 let editIndex = null;
 let currentPage = 1;
 const perPage = 10;
-
-/* ▼ 以下、ASMRbox の機能（省略なし） */
+    
+/* ▼ 以下、ASMRbox の機能 */
 async function fetchTitle(url) {
     try {
         const res = await fetch(`https://www.youtube.com/oembed?url=${url}&format=json`);
