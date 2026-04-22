@@ -434,8 +434,7 @@ async function addOrSave() {
         posts.unshift({ url, author, genres: checkedGenres, time: Date.now(), favorite: false, title });
     }
 
-    localStorage.setItem("posts", JSON.stringify(posts));
-    clearForm();
+    await saveToCloud();
     renderPosts();
 }
 
