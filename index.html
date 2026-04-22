@@ -190,7 +190,7 @@ body {
 <body>
 
 <!-- ======== ログイン画面 ======== -->
-<div id="loginArea" style="max-width:400px;margin:auto;display:none;">
+<div id="loginArea" class="login-area" style="display:none;">
   <h2>ログイン</h2>
   <input id="loginEmail" placeholder="メールアドレス">
   <input id="loginPass" type="password" placeholder="パスワード">
@@ -550,7 +550,6 @@ function renderPosts() {
 
         list.innerHTML += `
             <div class="post">
-
                 <div class="action-area">
                     <button class="action-btn fav-btn" onclick="toggleFavorite(${p.index})">${star}</button>
                     <button class="action-btn edit-btn" onclick="editPost(${p.index})">✏️</button>
