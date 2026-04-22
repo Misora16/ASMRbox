@@ -221,8 +221,9 @@ const firebaseConfig = {
   measurementId: "G-47CSW3WD4N"
 };
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
 /* ======== ログイン制御 ======== */
 function showLogin() {
