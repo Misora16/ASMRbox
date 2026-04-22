@@ -482,4 +482,11 @@ function renderPagination(total) {
     }
 
     pag.innerHTML += `<button onclick="goPage(currentPage+1)">></button>`;
-    pag.innerHTML += `<button onclick
+    pag.innerHTML += `<button onclick="goPage(${total})">≫</button>`;
+}
+
+function goPage(num) {
+    currentPage = num;
+    renderPosts();
+}
+</script>
