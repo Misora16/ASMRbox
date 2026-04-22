@@ -435,6 +435,7 @@ async function addOrSave() {
     }
 
     await saveToCloud();
+    clearForm();
     renderPosts();
 }
 
@@ -473,6 +474,7 @@ function clearForm() {
 async function deletePost(index) {
     posts.splice(index, 1);
     await saveToCloud();
+    clearForm();
     renderPosts();
 }
 
