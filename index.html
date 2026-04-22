@@ -66,12 +66,6 @@ body {
 }
 .tag:hover { background: #99ccff; }
 
-/* ▼ 検索ハイライト */
-.highlight {
-    background: #b3e5ff !important;
-    border-radius: 4px;
-}
-
 /* ▼ 投稿カード */
 .post {
     background: #fff;
@@ -82,13 +76,12 @@ body {
     position: relative;
 }
 
-/* ▼ 編集・削除・お気に入り */
+/* ▼ PC版のボタン位置（右上固定） */
 .action-btn {
     position: absolute;
     top: 6px;
     width: 26px;
     height: 26px;
-    padding: 0;
     font-size: 14px;
     border: none;
     border-radius: 6px;
@@ -110,43 +103,14 @@ body {
     border-radius: 8px;
 }
 
-/* ▼ 編集モード */
-.editing { background: #fff7cc; }
-
-/* ▼ ページネーション */
-.pagination { margin-top: 20px; text-align: center; }
-.pagination button { margin: 2px; padding: 6px 10px; }
-
-/* ▼ スマホ最適化（C方式） */
+/* ▼ スマホ最適化 */
 @media (max-width: 600px) {
 
-    .container {
-        padding: 12px;
-    }
-
-    input {
-        font-size: 18px;
-        padding: 12px;
-    }
-
-    /* 行ボタン大きく */
-    .row-button {
-        padding: 14px;
-        font-size: 18px;
-    }
-
-    /* ジャンルラベル1列 */
-    .genre-box label {
-        width: 100%;
-        font-size: 16px;
-        padding: 6px 0;
-    }
-
-    /* 投稿カードのボタンをタイトルの上に横並び */
     .post {
         padding-top: 10px;
     }
 
+    /* スマホではボタンをタイトル上に横並び */
     .action-area {
         display: flex;
         flex-direction: row;
@@ -162,13 +126,20 @@ body {
         font-size: 18px;
     }
 
-    /* URL折り返し */
-    .post a {
-        word-break: break-all;
+    /* ジャンルラベル1列 */
+    .genre-box label {
+        width: 100%;
         font-size: 16px;
+        padding: 6px 0;
     }
 
-    /* 追加・保存・キャンセルボタンを大きく */
+    /* 行ボタン大きく */
+    .row-button {
+        padding: 14px;
+        font-size: 18px;
+    }
+
+    /* 追加・保存・キャンセルボタン大きく */
     #mainBtn,
     #cancelBtn {
         font-size: 20px;
@@ -226,18 +197,18 @@ body {
 </div>
 
 <script>
-// ▼ 行ごとジャンル
+/* ▼ 行ごとジャンル */
 const genreGroups = {
-    "あ行": ["愛重め","甘々","甘やかし","甘サド","姉","イチャイチャ","妹","お姉さん"],
-    "か行": ["彼女","可愛い攻め","カワボ","環境音","監禁","看病","義姉","義妹","ギャル","共依存","KU100","コラボ"],
+    "あ行": ["甘々","甘やかし","甘サド","姉","イチャイチャ","妹"],
+    "か行": ["カワボ","彼女","環境音","監禁","看病","ギャル","共依存","KU100","コラボ"],
     "さ行": ["シチュボ","実写","囁き","シャンプー","心音","人外","スライム","声なし","声優"],
     "た行": ["タッピング","タイピング","タオルドライ","ダウナー","ツンデレ","低音","動画","年上","年下"],
-    "な行": ["撫で","認知シャッフル","のじゃロリ"],
+    "な行": ["撫で","認知シャッフル"],
     "は行": ["ハグ","膝枕","ペット"],
     "ま行": ["マッサージ","ママ","耳かき","メンヘラ"],
     "や行": ["ヤンデレ","百合"],
     "ら行": ["ライブ配信","リップ音"],
-    "わ行": ["わからせ"]
+    "わ行": ["ワード","ワンコ","和風"]
 };
 
 let posts = JSON.parse(localStorage.getItem("posts") || "[]");
@@ -257,7 +228,7 @@ async function fetchTitle(url) {
     }
 }
 
-/* ▼ ジャンル欄生成（安定版） */
+/* ▼ ジャンル欄生成 */
 function loadGenres() {
     const rowButtons = document.getElementById("rowButtons");
     const genreContainer = document.getElementById("genreContainer");
@@ -290,7 +261,7 @@ function loadGenres() {
 }
 loadGenres();
 
-/* ▼ アコーディオン（壊れない版） */
+/* ▼ アコーディオン */
 function toggleGenre(id, row) {
     const box = document.getElementById(id);
     const btn = document.querySelector(`.row-button[data-row="${row}"]`);
@@ -309,7 +280,7 @@ function toggleGenre(id, row) {
     }
 }
 
-/* ▼ ジャンル検索（C方式） */
+/* ▼ ジャンル検索 */
 function searchGenres() {
     const word = document.getElementById("genreSearch").value.trim();
 
@@ -505,28 +476,6 @@ function goPage(n) {
 }
 
 renderPosts();
-
-/* ▼ PC版のボタン位置を強制的に元に戻す（スマホより後に書くのが重要） */
-@media (min-width: 601px) {
-    .action-btn {
-        position: absolute !important;
-        top: 6px !important;
-        width: 26px !important;
-        height: 26px !important;
-        font-size: 14px !important;
-    }
-
-    .fav-btn { right: 72px !important; }
-    .edit-btn { right: 40px !important; }
-    .delete-btn { right: 8px !important; }
-
-    /* スマホ用の action-area の影響を消す */
-    .action-area {
-        display: block !important;
-        margin-bottom: 0 !important;
-    }
-}
-
 </script>
 
 </body>
