@@ -135,6 +135,39 @@ body {
         grid-template-columns: 1fr;
         gap: 10px;
     }
+   
+   /* ▼ 行ボタン（スマホでも押しやすいデザイン） */
+   .row-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: #f0f4ff;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    border: 1px solid #d0d8ff;
+    transition: background 0.2s, transform 0.1s;
+   }
+   
+   /* 押したときの反応 */
+   .row-button:active {
+    background: #dce6ff;
+    transform: scale(0.98);
+   }
+   
+   /* 開いている行の強調 */
+   .row-button.open {
+    background: #d6e4ff;
+    border-color: #8aa8ff;
+    font-weight: bold;
+   }
+   
+   /* アイコン部分（▶/▼） */
+   .row-button .icon {
+    font-size: 20px;
+   }
+
 
     /* ▼ ジャンル欄を1列に */
     .genre-box label {
@@ -380,11 +413,11 @@ function loadGenres() {
         `;
 
         genreContainer.innerHTML += `
-            <div class="genre-box" id="${id}">
-                ${genreGroups[row].map(g =>
-                    `<label><input type="checkbox" value="${g}" onchange="updateSelectedGenres()">${g}</label>`
-                ).join("")}
+            <div class="row-button" data-row="${row}" onclick="toggleGenre('${id}', '${row}')">
+                <span class="label">${row}</span>
+                <span class="icon">▶</span>
             </div>
+
         `;
 
         genreGroups[row].forEach(g => {
@@ -396,18 +429,22 @@ function loadGenres() {
 function toggleGenre(id, row) {
     const box = document.getElementById(id);
     const btn = document.querySelector(`.row-button[data-row="${row}"]`);
+    const icon = btn.querySelector(".icon");
 
     const isOpen = box.classList.contains("open");
 
+    // 全部閉じる
     document.querySelectorAll(".genre-box").forEach(b => b.classList.remove("open"));
     document.querySelectorAll(".row-button").forEach(b => {
-        const r = b.dataset.row;
-        b.textContent = "▶ " + r;
+        b.classList.remove("open");
+        b.querySelector(".icon").textContent = "▶";
     });
 
+    // 今押した行だけ開く
     if (!isOpen) {
         box.classList.add("open");
-        btn.textContent = "▼ " + row;
+        btn.classList.add("open");
+        icon.textContent = "▼";
     }
 }
 
