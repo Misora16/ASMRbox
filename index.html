@@ -101,14 +101,29 @@ body {
     border-radius: 8px;
 }
 
-/* ▼ スマホ最適化 */
+/* ▼ スマホ最適化（幅600px以下） */
 @media (max-width: 600px) {
 
-    .post {
-        padding-top: 10px;
+    .container {
+        padding: 12px;
     }
 
-    /* スマホではボタンをタイトル上に横並び */
+    input {
+        font-size: 18px;
+        padding: 12px;
+    }
+
+    .row-button {
+        padding: 14px;
+        font-size: 18px;
+    }
+
+    .genre-box label {
+        width: 100%;
+        font-size: 16px;
+        padding: 6px 0;
+    }
+
     .action-area {
         display: flex;
         flex-direction: row;
@@ -124,26 +139,23 @@ body {
         font-size: 18px;
     }
 
-    /* ジャンルラベル1列 */
-    .genre-box label {
-        width: 100%;
+    .post a {
+        word-break: break-all;
         font-size: 16px;
-        padding: 6px 0;
     }
 
-    /* 行ボタン大きく */
-    .row-button {
-        padding: 14px;
-        font-size: 18px;
+    .post {
+        font-size: 16px;
+        padding-top: 10px;
     }
 
-    /* 追加・保存・キャンセルボタン大きく */
-    #mainBtn,
-    #cancelBtn {
-        font-size: 20px;
-        padding: 14px;
-        width: 100%;
-        margin-top: 10px;
+    .filter-area {
+        font-size: 16px;
+    }
+
+    .pagination button {
+        padding: 10px 14px;
+        font-size: 16px;
     }
 }
 </style>
