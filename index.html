@@ -222,7 +222,11 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-</script>
+<script>
+const firebaseConfig = { … };
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 
 /* ======== ログイン制御 ======== */
 function showLogin() {
@@ -256,6 +260,7 @@ function signup() {
 function logout() {
     auth.signOut();
 }
+</script>
 
 /* ======== ASMRbox 本体の JS ======== */
 
