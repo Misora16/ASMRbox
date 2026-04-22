@@ -189,58 +189,63 @@ body {
 </head>
 <body>
 
-<!-- ======== ログイン画面 ======== -->
-<div id="loginArea" class="login-area" style="display:none;">
-  <h2>ログイン</h2>
-  <input id="loginEmail" placeholder="メールアドレス">
-  <input id="loginPass" type="password" placeholder="パスワード">
-  <button onclick="login()">ログイン</button>
-  <button onclick="signup()">新規登録</button>
-</div>
+<!-- ======== ASMRbox 全体コンテナ ======== -->
+<div class="container">
 
-<!-- ======== ASMRbox 本体 ======== -->
-<div class="container" id="appArea" style="display:none;">
+    <!-- ======== ログイン画面 ======== -->
+    <div id="loginArea" class="login-area" style="display:none;">
+      <h2>ログイン</h2>
+      <input id="loginEmail" placeholder="メールアドレス">
+      <input id="loginPass" type="password" placeholder="パスワード">
+      <button onclick="login()">ログイン</button>
+      <button onclick="signup()">新規登録</button>
+    </div>
 
-<button onclick="logout()">ログアウト</button>
+    <!-- ======== ASMRbox 本体 ======== -->
+    <div id="appArea" style="display:none;">
 
-<h2>ASMRbox</h2>
+        <button onclick="logout()">ログアウト</button>
 
-<h3>新規追加 / 編集</h3>
-<div id="formArea">
-    <input id="url" placeholder="URL">
-    <input id="author" placeholder="投稿者名">
+        <h2>ASMRbox</h2>
 
-    <h4>ジャンル（行を押して展開）</h4>
+        <h3>新規追加 / 編集</h3>
+        <div id="formArea">
+            <input id="url" placeholder="URL">
+            <input id="author" placeholder="投稿者名">
 
-    <input id="genreSearch" placeholder="ジャンル検索" oninput="searchGenres()">
+            <h4>ジャンル（行を押して展開）</h4>
 
-    <div id="selectedGenres" class="selected-tags"></div>
+            <input id="genreSearch" placeholder="ジャンル検索" oninput="searchGenres()">
 
-    <div id="rowButtons" class="row-grid"></div>
-    <div id="genreContainer"></div>
+            <div id="selectedGenres" class="selected-tags"></div>
 
-    <button id="mainBtn" onclick="addOrSave()">追加</button>
-    <button id="cancelBtn" style="display:none;" onclick="cancelEdit()">キャンセル</button>
-</div>
+            <div id="rowButtons" class="row-grid"></div>
+            <div id="genreContainer"></div>
 
-<hr>
+            <button id="mainBtn" onclick="addOrSave()">追加</button>
+            <button id="cancelBtn" style="display:none;" onclick="cancelEdit()">キャンセル</button>
+        </div>
 
-<div class="filter-area">
-<h3>絞り込み</h3>
-<input id="filterAuthor" placeholder="投稿者名で絞り込み" oninput="renderPosts()">
-<select id="filterGenre" onchange="renderPosts()">
-    <option value="">ジャンル指定なし</option>
-</select>
+        <hr>
 
-<label>
-    <input type="checkbox" id="filterFav" onchange="renderPosts()">
-    お気に入りのみ
-</label>
-</div>
+        <div class="filter-area">
+            <h3>絞り込み</h3>
+            <input id="filterAuthor" placeholder="投稿者名で絞り込み" oninput="renderPosts()">
+            <select id="filterGenre" onchange="renderPosts()">
+                <option value="">ジャンル指定なし</option>
+            </select>
 
-<h3>投稿一覧</h3>
-<div id="postList"></div>
-<div id="pagination" class="pagination"></div>
+            <label>
+                <input type="checkbox" id="filterFav" onchange="renderPosts()">
+                お気に入りのみ
+            </label>
+        </div>
+
+        <h3>投稿一覧</h3>
+        <div id="postList"></div>
+        <div id="pagination" class="pagination"></div>
+
+    </div>
 
 </div>
 
