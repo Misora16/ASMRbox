@@ -395,42 +395,45 @@ async function fetchTitle(url) {
     }
 }
 
-function loadGenres() {
-    const rowButtons = document.getElementById("rowButtons");
-    const genreContainer = document.getElementById("genreContainer");
-    const filter = document.getElementById("filterGenre");
+function searchGenres() {
+    const word = document.getElementById("genreSearch").value.trim();
 
-    // 初期化
-    rowButtons.innerHTML = "";
-    genreContainer.innerHTML = "";
-    filter.innerHTML = `<option value="">ジャンル指定なし</option>`;
+    // 全部閉じる
+    document.querySelectorAll(".genre-box").forEach(box => {
+        box.classList.remove("open");
+        box.querySelectorAll("label").forEach(l => l.classList.remove("highlight"));
+    });
 
-    // 行ごとに生成
+    // 行ボタンをリセット（新UI対応）
+    document.querySelectorAll(".row-button").forEach(btn => {
+        const row = btn.dataset.row;
+        btn.querySelector(".label").textContent = row;
+        btn.querySelector(".icon").textContent = "▶";
+        btn.classList.remove("open");
+    });
+
+    if (word === "") return;
+
+    // 検索
     for (const row in genreGroups) {
         const id = "box_" + row;
+        const box = document.getElementById(id);
+        const btn = document.querySelector(`.row-button[data-row="${row}"]`);
 
-        // 行ボタン（アイコン右側）
-        rowButtons.innerHTML += `
-            <div class="row-button" data-row="${row}" onclick="toggleGenre('${id}', '${row}')">
-                <span class="label">${row}</span>
-                <span class="icon">▶</span>
-            </div>
-        `;
+        let hit = false;
 
-        // ジャンル一覧
-       genreContainer.innerHTML += `
-    <div class="genre-box" id="${id}">
-        ${genreGroups[row].map(g =>
-            `<label><input type="checkbox" value="${g}" onchange="updateSelectedGenres()">${g}</label>`
-        ).join("")}
-    </div>
-`;
-
-
-        // 絞り込み用
-        genreGroups[row].forEach(g => {
-            filter.innerHTML += `<option value="${g}">${g}</option>`;
+        box.querySelectorAll("label").forEach(label => {
+            if (label.textContent.includes(word)) {
+                label.classList.add("highlight");
+                hit = true;
+            }
         });
+
+        if (hit) {
+            box.classList.add("open");
+            btn.classList.add("open");
+            btn.querySelector(".icon").textContent = "▼";
+        }
     }
 }
 
@@ -465,7 +468,9 @@ function searchGenres() {
     });
     document.querySelectorAll(".row-button").forEach(btn => {
         const row = btn.dataset.row;
-        btn.textContent = "▶ " + row;
+       btn.querySelector(".label").textContent = row;
+       btn.querySelector(".icon").textContent = "▶";
+
     });
 
     if (word === "") return;
