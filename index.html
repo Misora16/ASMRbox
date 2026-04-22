@@ -4,7 +4,117 @@
 <meta charset="UTF-8">
 <title>ASMRbox</title>
 <style>
-/* 必要ならここにあなたの CSS を入れてね */
+/* ======== 全体レイアウト ======== */
+body {
+    font-family: sans-serif;
+    margin: 20px;
+    background: #fafafa;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+}
+
+/* ======== 入力フォーム ======== */
+input, select {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0;
+    box-sizing: border-box;
+}
+
+/* ======== ジャンル選択 UI ======== */
+.row-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+    gap: 6px;
+    margin: 10px 0;
+}
+
+.row-grid button {
+    padding: 6px;
+    background: #eee;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.genre-box {
+    display: none;
+    padding: 6px;
+    margin-bottom: 10px;
+    border-left: 3px solid #999;
+}
+
+.genre-box button {
+    margin: 4px;
+    padding: 4px 8px;
+    background: #f0f0f0;
+    border: 1px solid #bbb;
+    cursor: pointer;
+}
+
+/* 選択済みタグ */
+.selected-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 10px 0;
+}
+
+.selected-tags span {
+    background: #d0f0ff;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+/* ======== 投稿一覧 ======== */
+.post-item {
+    background: white;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    position: relative;
+}
+
+/* ======== 投稿ボタン（編集・削除・お気に入り） ======== */
+.action-area {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: flex;
+    gap: 6px;
+}
+
+.action-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    background: #eee;
+}
+
+/* ======== ページネーション ======== */
+.pagination {
+    display: flex;
+    gap: 6px;
+    margin-top: 20px;
+}
+
+.pagination button {
+    padding: 6px 10px;
+}
+
+/* ======== スマホ最適化 ======== */
+@media (max-width: 600px) {
+    .action-area {
+        position: static;
+        margin-top: 10px;
+        justify-content: flex-end;
+    }
+}
+
 </style>
 </head>
 <body>
@@ -120,11 +230,11 @@ function logout() {
 /* ======== ASMRbox 本体の JS ======== */
 const genreGroups = {
   "あ行": ["愛重め","甘々","甘やかし","甘サド","姉","イチャイチャ","妹","お姉さん"],
-  "か行": ["彼女","カワボ","環境音","監禁","看病","護衛","共依存","KU100","コラボ"],
-  "さ行": ["シュチュ","実写","寝","添い寝","心音","人外","スライム","声なし","声優","全肯定"],
-  "た行": ["タッピング","タイピング","タタルドドライ","ダウナー","ツンデレ","低音","吐息","動画","動物","年上","年下"],
+  "か行": ["彼女","カワボ","環境音","監禁","看病","共依存","KU100","声なし","コラボ"],
+  "さ行": ["シチュボ","実写","心音","人外","スライム","声優","全肯定","添い寝"],
+  "た行": ["タイピング","ダウナー","タッピング","ツンデレ","低音","吐息","動画","動物","年上","年下"],
   "な行": ["撫で","認知シャッフル","のじゃロリ"],
-  "は行": ["ハツ","屈倒","ハムボ","膝枕","ペット","ボーイッシュ","僕っ子"],
+  "は行": ["罵倒","ハムボ","膝枕","ペット","ボーイッシュ","僕っ子"],
   "ま行": ["マッサージ","ママ","耳かき","耳ふさぎ","メンヘラ"],
   "や行": ["ヤンデレ","百合"],
   "ら行": ["ライブ配信","リップ音"],
