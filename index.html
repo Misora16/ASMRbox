@@ -6,6 +6,7 @@
 <title>ASMRbox</title>
 
 <style>
+/* ======== 基本レイアウト ======== */
 body {
     font-family: sans-serif;
     margin: 20px;
@@ -19,7 +20,7 @@ body {
     border-radius: 10px;
 }
 
-/* ▼ 行ボタン */
+/* ======== 行ボタン ======== */
 .row-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -37,7 +38,7 @@ body {
     font-weight: bold;
 }
 
-/* ▼ ジャンルボックス */
+/* ======== ジャンルボックス ======== */
 .genre-box {
     display: none;
     padding: 10px;
@@ -54,7 +55,7 @@ body {
     margin-bottom: 5px;
 }
 
-/* ▼ 選択タグ */
+/* ======== 選択タグ ======== */
 .selected-tags { margin: 10px 0; }
 .tag {
     display: inline-block;
@@ -66,7 +67,7 @@ body {
 }
 .tag:hover { background: #99ccff; }
 
-/* ▼ 投稿カード */
+/* ======== 投稿カード ======== */
 .post {
     background: #fff;
     padding: 15px;
@@ -76,7 +77,7 @@ body {
     position: relative;
 }
 
-/* ▼ PC版のボタン位置（右上固定） */
+/* ======== PC版のボタン位置 ======== */
 .action-btn {
     position: absolute;
     top: 6px;
@@ -95,7 +96,7 @@ body {
 .edit-btn { right: 40px; background: #4da3ff; }
 .delete-btn { right: 8px; background: #ff6666; }
 
-/* ▼ 絞り込み */
+/* ======== 絞り込み ======== */
 .filter-area {
     margin-top: 20px;
     padding: 10px;
@@ -103,14 +104,13 @@ body {
     border-radius: 8px;
 }
 
-/* ▼ スマホ最適化 */
+/* ======== スマホ最適化 ======== */
 @media (max-width: 600px) {
 
     .post {
         padding-top: 10px;
     }
 
-    /* スマホではボタンをタイトル上に横並び */
     .action-area {
         display: flex;
         flex-direction: row;
@@ -126,20 +126,17 @@ body {
         font-size: 18px;
     }
 
-    /* ジャンルラベル1列 */
     .genre-box label {
         width: 100%;
         font-size: 16px;
         padding: 6px 0;
     }
 
-    /* 行ボタン大きく */
     .row-button {
         padding: 14px;
         font-size: 18px;
     }
 
-    /* 追加・保存・キャンセルボタン大きく */
     #mainBtn,
     #cancelBtn {
         font-size: 20px;
@@ -153,7 +150,19 @@ body {
 
 <body>
 
-<div class="container">
+<!-- ======== ログイン画面 ======== -->
+<div id="loginArea" style="max-width:400px;margin:auto;display:none;">
+  <h2>ログイン</h2>
+  <input id="loginEmail" placeholder="メールアドレス">
+  <input id="loginPass" type="password" placeholder="パスワード">
+  <button onclick="login()">ログイン</button>
+  <button onclick="signup()">新規登録</button>
+</div>
+
+<!-- ======== ASMRbox 本体 ======== -->
+<div class="container" id="appArea" style="display:none;">
+
+<button onclick="logout()">ログアウト</button>
 
 <h2>ASMRbox</h2>
 
@@ -196,15 +205,67 @@ body {
 
 </div>
 
+<!-- ======== Firebase SDK ======== -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+
 <script>
-/* ▼ 行ごとジャンル */
+/* ======== Firebase 設定（ここを書き換えてね） ======== */
+const firebaseConfig = {
+  apiKey: "AIzaSyAPSv0fSvoMNPw5Ua95JJjY2pppwwMqcsY",
+  authDomain: "asmrbox-69b3a.firebaseapp.com",
+  projectId: "asmrbox-69b3a",
+  storageBucket: "asmrbox-69b3a.firebasestorage.app",
+  messagingSenderId: "320429813177",
+  appId: "1:320429813177:web:64f47359ec47e9730a1a68",
+  measurementId: "G-47CSW3WD4N"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+
+/* ======== ログイン制御 ======== */
+function showLogin() {
+    document.getElementById("loginArea").style.display = "block";
+    document.getElementById("appArea").style.display = "none";
+}
+function showApp() {
+    document.getElementById("loginArea").style.display = "none";
+    document.getElementById("appArea").style.display = "block";
+}
+
+auth.onAuthStateChanged(user => {
+    if (user) showApp();
+    else showLogin();
+});
+
+function login() {
+    const email = loginEmail.value;
+    const pass = loginPass.value;
+    auth.signInWithEmailAndPassword(email, pass)
+        .catch(e => alert("ログイン失敗: " + e.message));
+}
+
+function signup() {
+    const email = loginEmail.value;
+    const pass = loginPass.value;
+    auth.createUserWithEmailAndPassword(email, pass)
+        .catch(e => alert("登録失敗: " + e.message));
+}
+
+function logout() {
+    auth.signOut();
+}
+
+/* ======== ASMRbox 本体の JS ======== */
+
 const genreGroups = {
-    "あ行": ["重めの愛","甘々","甘やかし","甘サド","姉","イチャイチャ","妹","お姉さん"],
-    "か行": ["カワボ","彼女","環境音","監禁","看病","義姉","義妹","ギャル","共依存","KU100","コラボ"],
-    "さ行": ["シチュボ","実写","囁き","シャンプー","Short","心音","人外","スライム","声なし","声優"],
-    "た行": ["タッピング","タイピング","タオルドライ","ダウナー","ツンデレ","低音","動画","年上","年下"],
+    "あ行": ["愛重め","甘々","甘やかし","甘サド","姉","イチャイチャ","妹","お姉さん"],
+    "か行": ["彼女","カワボ","環境音","監禁","看病","義姉","義妹","ギャル","共依存","KU100","コラボ"],
+    "さ行": ["シチュボ","実写","囁き","シャンプー","心音","人外","スライム","声なし","声優","全肯定"],
+    "た行": ["タッピング","タイピング","タオルドライ","ダウナー","ツンデレ","低音","吐息","動画","動物","年上","年下"],
     "な行": ["撫で","認知シャッフル","のじゃロリ"],
-    "は行": ["ハグ","膝枕","ペット"],
+    "は行": ["ハグ","罵倒","ハムボ","膝枕","ペット","ボーイッシュ","僕っ子"],
     "ま行": ["マッサージ","ママ","耳かき","耳ふさぎ","メンヘラ"],
     "や行": ["ヤンデレ","百合"],
     "ら行": ["ライブ配信","リップ音"],
@@ -216,7 +277,7 @@ let editIndex = null;
 let currentPage = 1;
 const perPage = 10;
 
-/* ▼ YouTubeタイトル取得 */
+/* ▼ 以下、ASMRbox の機能（省略なし） */
 async function fetchTitle(url) {
     try {
         const res = await fetch(`https://www.youtube.com/oembed?url=${url}&format=json`);
@@ -228,7 +289,6 @@ async function fetchTitle(url) {
     }
 }
 
-/* ▼ ジャンル欄生成 */
 function loadGenres() {
     const rowButtons = document.getElementById("rowButtons");
     const genreContainer = document.getElementById("genreContainer");
@@ -261,7 +321,6 @@ function loadGenres() {
 }
 loadGenres();
 
-/* ▼ アコーディオン */
 function toggleGenre(id, row) {
     const box = document.getElementById(id);
     const btn = document.querySelector(`.row-button[data-row="${row}"]`);
@@ -280,7 +339,6 @@ function toggleGenre(id, row) {
     }
 }
 
-/* ▼ ジャンル検索 */
 function searchGenres() {
     const word = document.getElementById("genreSearch").value.trim();
 
@@ -316,20 +374,17 @@ function searchGenres() {
     }
 }
 
-/* ▼ 選択タグ表示 */
 function updateSelectedGenres() {
     const selected = [...document.querySelectorAll("input[type=checkbox]:checked")].map(i => i.value);
     document.getElementById("selectedGenres").innerHTML =
         selected.map(g => `<span class="tag" onclick="removeGenre('${g}')">${g}</span>`).join("");
 }
 
-/* ▼ タグクリック解除 */
 function removeGenre(g) {
     document.querySelectorAll(`input[value="${g}"]`).forEach(i => i.checked = false);
     updateSelectedGenres();
 }
 
-/* ▼ 追加 or 保存 */
 async function addOrSave() {
     const url = document.getElementById("url").value;
     const author = document.getElementById("author").value;
@@ -357,7 +412,6 @@ async function addOrSave() {
     renderPosts();
 }
 
-/* ▼ 編集開始 */
 function editPost(index) {
     const p = posts[index];
 
@@ -375,7 +429,6 @@ function editPost(index) {
     document.getElementById("formArea").classList.add("editing");
 }
 
-/* ▼ 編集キャンセル */
 function cancelEdit() {
     editIndex = null;
     clearForm();
@@ -384,7 +437,6 @@ function cancelEdit() {
     document.getElementById("formArea").classList.remove("editing");
 }
 
-/* ▼ フォームクリア */
 function clearForm() {
     document.getElementById("url").value = "";
     document.getElementById("author").value = "";
@@ -392,21 +444,18 @@ function clearForm() {
     updateSelectedGenres();
 }
 
-/* ▼ 削除 */
 function deletePost(index) {
     posts.splice(index, 1);
     localStorage.setItem("posts", JSON.stringify(posts));
     renderPosts();
 }
 
-/* ▼ お気に入り切り替え */
 function toggleFavorite(index) {
     posts[index].favorite = !posts[index].favorite;
     localStorage.setItem("posts", JSON.stringify(posts));
     renderPosts();
 }
 
-/* ▼ 投稿表示（ページネーション対応） */
 function renderPosts() {
     const list = document.getElementById("postList");
     list.innerHTML = "";
@@ -450,7 +499,6 @@ function renderPosts() {
     renderPagination(totalPages);
 }
 
-/* ▼ ページネーション */
 function renderPagination(total) {
     const pag = document.getElementById("pagination");
     pag.innerHTML = "";
@@ -465,18 +513,4 @@ function renderPagination(total) {
     }
 
     pag.innerHTML += `<button onclick="goPage(currentPage+1)">></button>`;
-    pag.innerHTML += `<button onclick="goPage(${total})">≫</button>`;
-}
-
-function goPage(n) {
-    const total = Math.ceil(posts.length / perPage);
-    if (n < 1 || n > total) return;
-    currentPage = n;
-    renderPosts();
-}
-
-renderPosts();
-</script>
-
-</body>
-</html>
+    pag.innerHTML += `<button onclick
