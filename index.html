@@ -117,90 +117,66 @@ body {
 .pagination { margin-top: 20px; text-align: center; }
 .pagination button { margin: 2px; padding: 6px 10px; }
 
-/* ▼ スマホ最適化（幅600px以下） */
+/* ▼ スマホ最適化（C方式） */
 @media (max-width: 600px) {
 
-    /* 全体の余白を少し狭くする */
     .container {
         padding: 12px;
     }
 
-    /* 入力欄を押しやすく */
     input {
         font-size: 18px;
         padding: 12px;
     }
 
-    /* 行ボタンを大きくして押しやすく */
+    /* 行ボタン大きく */
     .row-button {
         padding: 14px;
         font-size: 18px;
     }
 
-    /* ジャンルラベルを1列にして見やすく */
+    /* ジャンルラベル1列 */
     .genre-box label {
         width: 100%;
         font-size: 16px;
         padding: 6px 0;
     }
 
-    /* アクションボタン（⭐✏️🗑）のタップ領域を広げる */
+    /* 投稿カードのボタンをタイトルの上に横並び */
+    .post {
+        padding-top: 10px;
+    }
+
+    .action-area {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
     .action-btn {
-        width: 34px;
-        height: 34px;
+        position: static;
+        width: 36px;
+        height: 36px;
         font-size: 18px;
     }
 
-    /* URLが画面からはみ出さないように折り返す */
+    /* URL折り返し */
     .post a {
         word-break: break-all;
         font-size: 16px;
     }
 
-    /* 投稿カードの文字サイズ調整 */
-    .post {
-        font-size: 16px;
-    }
-
-    /* 絞り込みエリアの文字サイズ */
-    .filter-area {
-        font-size: 16px;
-    }
-
-    /* ページネーションのボタンを押しやすく */
-    .pagination button {
-        padding: 10px 14px;
-        font-size: 16px;
+    /* 追加・保存・キャンセルボタンを大きく */
+    #mainBtn,
+    #cancelBtn {
+        font-size: 20px;
+        padding: 14px;
+        width: 100%;
+        margin-top: 10px;
     }
 }
-
-@media (max-width: 600px) {
-
-    /* 投稿カードの右上ボタンを縦並びにする */
-    .action-btn {
-        position: static;
-        margin-right: 0;
-        margin-bottom: 6px;
-    }
-
-    .post {
-        position: relative;
-        padding-top: 10px;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-
-    /* ボタンをまとめる専用の枠を作る */
-    .post .action-area {
-        display: flex;
-        flex-direction: row;
-        gap: 10px;
-        margin-bottom: 6px;
-    }
-}
-
-
 </style>
 </head>
 
@@ -252,16 +228,16 @@ body {
 <script>
 // ▼ 行ごとジャンル
 const genreGroups = {
-    "あ行": ["甘々","雨音","甘やかし","甘サド","姉","イチャイチャ","妹"],
-    "か行": ["カワボ","彼女","環境音","監禁","看病","狐","ギャル","共依存","KU100","コラボ"],
-    "さ行": ["シチュボ","実写","囁き","シャンプー","心音","人外","スライム","声なし","声優","咀嚼音"],
-    "た行": ["タッピング","タイピング","タオルドライ","ダウナー","焚火","炭酸","ツンデレ","TS","低音","吐息","動画","年上","年下"],
+    "あ行": ["甘々","甘やかし","甘サド","姉","イチャイチャ","妹"],
+    "か行": ["カワボ","彼女","環境音","監禁","看病","ギャル","共依存","KU100","コラボ"],
+    "さ行": ["シチュボ","実写","囁き","シャンプー","心音","人外","スライム","声なし","声優"],
+    "た行": ["タッピング","タイピング","タオルドライ","ダウナー","ツンデレ","低音","動画","年上","年下"],
     "な行": ["撫で","認知シャッフル"],
-    "は行": ["ハグ","罵倒","膝枕","VTuber","ボーイッシュ","僕っ子","梵天"],
-    "ま行": ["マッサージ","ママ","耳かき","耳舐め","耳ふさぎ","メイド","メス堕ち","メンヘラ"],
-    "や行": ["ヤンデレ","指耳かき","百合"],
+    "は行": ["ハグ","膝枕","ペット"],
+    "ま行": ["マッサージ","ママ","耳かき","メンヘラ"],
+    "や行": ["ヤンデレ","百合"],
     "ら行": ["ライブ配信","リップ音"],
-    "わ行": ["わからせ"]
+    "わ行": []
 };
 
 let posts = JSON.parse(localStorage.getItem("posts") || "[]");
@@ -485,9 +461,12 @@ function renderPosts() {
 
         list.innerHTML += `
             <div class="post">
-                <button class="action-btn fav-btn" onclick="toggleFavorite(${p.index})">${star}</button>
-                <button class="action-btn edit-btn" onclick="editPost(${p.index})">✏️</button>
-                <button class="action-btn delete-btn" onclick="deletePost(${p.index})">🗑</button>
+
+                <div class="action-area">
+                    <button class="action-btn fav-btn" onclick="toggleFavorite(${p.index})">${star}</button>
+                    <button class="action-btn edit-btn" onclick="editPost(${p.index})">✏️</button>
+                    <button class="action-btn delete-btn" onclick="deletePost(${p.index})">🗑</button>
+                </div>
 
                 ${p.title ? `<div><strong>${p.title}</strong></div>` : ""}
                 <a href="${p.url}" target="_blank">${p.url}</a><br>
