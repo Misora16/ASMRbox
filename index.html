@@ -433,6 +433,22 @@ function loadGenres() {
     }
 }
 
+        // ジャンル一覧
+        genreContainer.innerHTML += `
+            <div class="genre-box" id="${id}">
+                ${genreGroups[row].map(g =>
+                    `<label><input type="checkbox" value="${g}" onchange="updateSelectedGenres()">${g}</label>`
+                ).join("")}
+            </div>
+        `;
+
+        // 絞り込み用
+        genreGroups[row].forEach(g => {
+            filter.innerHTML += `<option value="${g}">${g}</option>`;
+        });
+    }
+}
+
 function toggleGenre(id, row) {
     const box = document.getElementById(id);
     const btn = document.querySelector(`.row-button[data-row="${row}"]`);
