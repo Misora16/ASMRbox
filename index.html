@@ -236,8 +236,13 @@ function showApp() {
 }
 
 auth.onAuthStateChanged(user => {
-    if (user) showApp();
-    else showLogin();
+    if (user) {
+        showApp();
+        loadGenres();      // ← ジャンル生成
+        renderPosts();     // ← 投稿一覧生成
+    } else {
+        showLogin();
+    }
 });
 
 function login() {
@@ -319,7 +324,6 @@ function loadGenres() {
         });
     }
 }
-loadGenres();
 
 function toggleGenre(id, row) {
     const box = document.getElementById(id);
@@ -477,7 +481,7 @@ function renderPosts() {
     const pageItems = filtered.slice(start, start + perPage);
 
     pageItems.forEach(p => {
-        const star = p.favorite ? "⭐" : "☆";
+        const star = p.favorite ? "★" : "☆";
 
         list.innerHTML += `
             <div class="post">
