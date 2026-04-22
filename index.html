@@ -400,11 +400,9 @@ function loadGenres() {
     const genreContainer = document.getElementById("genreContainer");
     const filter = document.getElementById("filterGenre");
 
-    rowButtons.innerHTML = "";
-    genreContainer.innerHTML = "";
-
-    for (const row in genreGroups) {
-        const id = "box_" + row;
+    rowButtons.innerHTML = "";      // ★ 追加
+    genreContainer.innerHTML = "";  // ★ 追加
+    filter.innerHTML = `<option value="">ジャンル指定なし</option>`; // ★ 追加
 
         rowButtons.innerHTML += `
             <div class="row-button" data-row="${row}" onclick="toggleGenre('${id}', '${row}')">
