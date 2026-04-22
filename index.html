@@ -210,7 +210,6 @@ body {
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
 <script>
-/* ======== Firebase 設定（ここを書き換えてね） ======== */
 const firebaseConfig = {
   apiKey: "AIzaSyAPSv0fSvoMNPw5Ua95JJjY2pppwwMqcsY",
   authDomain: "asmrbox-69b3a.firebaseapp.com",
@@ -221,9 +220,9 @@ const firebaseConfig = {
   measurementId: "G-47CSW3WD4N"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+</script>
 
 /* ======== ログイン制御 ======== */
 function showLogin() {
