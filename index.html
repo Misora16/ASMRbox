@@ -104,26 +104,67 @@ body {
 /* ▼ スマホ最適化（幅600px以下） */
 @media (max-width: 600px) {
 
+    /* 画面全体をスマホ幅に最適化 */
+    body {
+        margin: 0;
+        padding: 0;
+        background: #fafafa;
+    }
+
     .container {
+        width: 100%;
         padding: 12px;
+        box-sizing: border-box;
     }
 
-    input {
-        font-size: 18px;
-        padding: 12px;
+    /* ▼ ログイン画面を縦長1列に */
+    #loginArea {
+        width: 100%;
+        max-width: 360px;
+        margin: 0 auto;
+        padding: 20px;
     }
 
-    .row-button {
-        padding: 14px;
+    #loginArea input {
+        width: 100%;
         font-size: 18px;
+        padding: 12px;
+        margin-bottom: 12px;
+        box-sizing: border-box;
+    }
+
+    #loginArea button {
+        width: 100%;
+        font-size: 18px;
+        padding: 12px;
+        margin-bottom: 10px;
+    }
+
+    /* ▼ ジャンル欄を1列に */
+    .row-grid {
+        grid-template-columns: 1fr; /* 行ボタンを1列に */
+        gap: 10px;
     }
 
     .genre-box label {
-        width: 100%;
+        width: 100%; /* ジャンルを1列に */
+        display: block;
+        padding: 8px 0;
         font-size: 16px;
-        padding: 6px 0;
     }
 
+    /* ▼ 投稿カードのスマホ最適化 */
+    .post {
+        padding: 12px;
+        font-size: 16px;
+    }
+
+    .post a {
+        word-break: break-all;
+        font-size: 16px;
+    }
+
+    /* ▼ アクションボタンをタイトル上に横並び */
     .action-area {
         display: flex;
         flex-direction: row;
@@ -139,25 +180,22 @@ body {
         font-size: 18px;
     }
 
-    .post a {
-        word-break: break-all;
+    /* ▼ フィルター欄 */
+    .filter-area input,
+    .filter-area select {
+        width: 100%;
         font-size: 16px;
+        padding: 10px;
+        margin-bottom: 10px;
     }
 
-    .post {
-        font-size: 16px;
-        padding-top: 10px;
-    }
-
-    .filter-area {
-        font-size: 16px;
-    }
-
+    /* ▼ ページネーション */
     .pagination button {
         padding: 10px 14px;
         font-size: 16px;
     }
 }
+
 </style>
 </head>
 <body>
