@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASMRbox</title>
+
+<style>
+body {
+    font-family: sans-serif;
+    margin: 20px;
+    background: #f5f5f5;
+}
+.container {
+    max-width: 800px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+/* ▼ 行ボタン */
+.row-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+@media (max-width: 600px) {
+    .row-grid { grid-template-columns: 1fr; }
+}
+.row-button {
+    background: #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* ▼ ジャンルボックス */
+.genre-box {
+    display: none;
+    padding: 10px;
+    background: #f8f8f8;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+.genre-box.open {
+    display: block;
+}
+.genre-box label {
+    display: inline-block;
+    width: 48%;
+    margin-bottom: 5px;
+}
+
+/* ▼ 選択タグ */
+.selected-tags { margin: 10px 0; }
+.tag {
+    display: inline-block;
+    background: #cce5ff;
+    padding: 5px 10px;
+    margin: 3px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.tag:hover { background: #99ccff; }
+
+/* ▼ 検索ハイライト */
+.highlight {
+    background: #b3e5ff !important;
+    border-radius: 4px;
+}
+
+/* ▼ 投稿カード */
+.post {
+    background: #fff;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    position: relative;
+}
+
+/* ▼ 編集・削除・お気に入り */
+.action-btn {
+    position: absolute;
+    top: 6px;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.fav-btn { right: 72px; background: #ffcc00; color: black; }
+.edit-btn { right: 40px; background: #4da3ff; }
+.delete-btn { right: 8px; background: #ff6666; }
+
+/* ▼ 絞り込み */
+.filter-area {
+    margin-top: 20px;
+    padding: 10px;
+    background: #eef;
+    border-radius: 8px;
+}
+
+/* ▼ 編集モード */
+.editing { background: #fff7cc; }
+
+/* ▼ ページネーション */
+.pagination { margin-top: 20px; text-align: center; }
+.pagination button { margin: 2px; padding: 6px 10px; }
+
+/* ▼ スマホ最適化（幅600px以下） */
+@media (max-width: 600px) {
+
+    /* 全体の余白を少し狭くする */
+    .container {
+        padding: 12px;
+    }
+
+    /* 入力欄を押しやすく */
+    input {
+        font-size: 18px;
+        padding: 12px;
+    }
+
+    /* 行ボタンを大きくして押しやすく */
+    .row-button {
+        padding: 14px;
+        font-size: 18px;
+    }
+
+    /* ジャンルラベルを1列にして見やすく */
+    .genre-box label {
+        width: 100%;
+        font-size: 16px;
+        padding: 6px 0;
+    }
+
+    /* アクションボタン（⭐✏️🗑）のタップ領域を広げる */
+    .action-btn {
+        width: 34px;
+        height: 34px;
+        font-size: 18px;
+    }
+
+    /* URLが画面からはみ出さないように折り返す */
+    .post a {
+        word-break: break-all;
+        font-size: 16px;
+    }
+
+    /* 投稿カードの文字サイズ調整 */
+    .post {
+        font-size: 16px;
+    }
+
+    /* 絞り込みエリアの文字サイズ */
+    .filter-area {
+        font-size: 16px;
+    }
+
+    /* ページネーションのボタンを押しやすく */
+    .pagination button {
+        padding: 10px 14px;
+        font-size: 16px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>ASMRbox</h2>
+
+<h3>新規追加 / 編集</h3>
+<div id="formArea">
+    <input id="url" placeholder="URL">
+    <input id="author" placeholder="投稿者名">
+
+    <h4>ジャンル（行を押して展開）</h4>
+
+    <input id="genreSearch" placeholder="ジャンル検索" oninput="searchGenres()">
+
+    <div id="selectedGenres" class="selected-tags"></div>
+
+    <div id="rowButtons" class="row-grid"></div>
+    <div id="genreContainer"></div>
+
+    <button id="mainBtn" onclick="addOrSave()">追加</button>
+    <button id="cancelBtn" style="display:none;" onclick="cancelEdit()">キャンセル</button>
+</div>
+
+<hr>
+
+<div class="filter-area">
+<h3>絞り込み</h3>
+<input id="filterAuthor" placeholder="投稿者名で絞り込み" oninput="renderPosts()">
+<select id="filterGenre" onchange="renderPosts()">
+    <option value="">ジャンル指定なし</option>
+</select>
+
+<label>
+    <input type="checkbox" id="filterFav" onchange="renderPosts()">
+    お気に入りのみ
+</label>
+</div>
+
+<h3>投稿一覧</h3>
+<div id="postList"></div>
+<div id="pagination" class="pagination"></div>
+
+</div>
+
+<script>
+// ▼ 行ごとジャンル
+const genreGroups = {
+    "あ行": ["甘々","甘やかし","甘サド","姉","イチャイチャ","妹"],
+    "か行": ["カワボ","彼女","環境音","監禁","看病","ギャル","共依存","KU100","コラボ"],
+    "さ行": ["シチュボ","実写","囁き","シャンプー","心音","人外","スライム","声なし","声優"],
+    "た行": ["タッピング","タイピング","タオルドライ","ダウナー","ツンデレ","低音","動画","年上","年下"],
+    "な行": ["撫で","認知シャッフル"],
+    "は行": ["ハグ","膝枕","ペット"],
+    "ま行": ["マッサージ","ママ","耳かき","メンヘラ"],
+    "や行": ["ヤンデレ","百合"],
+    "ら行": ["ライブ配信","リップ音"],
+    "わ行": []
+};
+
+let posts = JSON.parse(localStorage.getItem("posts") || "[]");
+let editIndex = null;
+let currentPage = 1;
+const perPage = 10;
+
+/* ▼ YouTubeタイトル取得 */
+async function fetchTitle(url) {
+    try {
+        const res = await fetch(`https://www.youtube.com/oembed?url=${url}&format=json`);
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data.title;
+    } catch {
+        return null;
+    }
+}
+
+/* ▼ ジャンル欄生成（安定版） */
+function loadGenres() {
+    const rowButtons = document.getElementById("rowButtons");
+    const genreContainer = document.getElementById("genreContainer");
+    const filter = document.getElementById("filterGenre");
+
+    rowButtons.innerHTML = "";
+    genreContainer.innerHTML = "";
+
+    for (const row in genreGroups) {
+        const id = "box_" + row;
+
+        rowButtons.innerHTML += `
+            <div class="row-button" data-row="${row}" onclick="toggleGenre('${id}', '${row}')">
+                ▶ ${row}
+            </div>
+        `;
+
+        genreContainer.innerHTML += `
+            <div class="genre-box" id="${id}">
+                ${genreGroups[row].map(g =>
+                    `<label><input type="checkbox" value="${g}" onchange="updateSelectedGenres()">${g}</label>`
+                ).join("")}
+            </div>
+        `;
+
+        genreGroups[row].forEach(g => {
+            filter.innerHTML += `<option value="${g}">${g}</option>`;
+        });
+    }
+}
+loadGenres();
+
+/* ▼ アコーディオン（壊れない版） */
+function toggleGenre(id, row) {
+    const box = document.getElementById(id);
+    const btn = document.querySelector(`.row-button[data-row="${row}"]`);
+
+    const isOpen = box.classList.contains("open");
+
+    document.querySelectorAll(".genre-box").forEach(b => b.classList.remove("open"));
+    document.querySelectorAll(".row-button").forEach(b => {
+        const r = b.dataset.row;
+        b.textContent = "▶ " + r;
+    });
+
+    if (!isOpen) {
+        box.classList.add("open");
+        btn.textContent = "▼ " + row;
+    }
+}
+
+/* ▼ ジャンル検索（C方式） */
+function searchGenres() {
+    const word = document.getElementById("genreSearch").value.trim();
+
+    document.querySelectorAll(".genre-box").forEach(box => {
+        box.classList.remove("open");
+        box.querySelectorAll("label").forEach(l => l.classList.remove("highlight"));
+    });
+    document.querySelectorAll(".row-button").forEach(btn => {
+        const row = btn.dataset.row;
+        btn.textContent = "▶ " + row;
+    });
+
+    if (word === "") return;
+
+    for (const row in genreGroups) {
+        const id = "box_" + row;
+        const box = document.getElementById(id);
+        const btn = document.querySelector(`.row-button[data-row="${row}"]`);
+
+        let hit = false;
+
+        box.querySelectorAll("label").forEach(label => {
+            if (label.textContent.includes(word)) {
+                label.classList.add("highlight");
+                hit = true;
+            }
+        });
+
+        if (hit) {
+            box.classList.add("open");
+            btn.textContent = "▼ " + row;
+        }
+    }
+}
+
+/* ▼ 選択タグ表示 */
+function updateSelectedGenres() {
+    const selected = [...document.querySelectorAll("input[type=checkbox]:checked")].map(i => i.value);
+    document.getElementById("selectedGenres").innerHTML =
+        selected.map(g => `<span class="tag" onclick="removeGenre('${g}')">${g}</span>`).join("");
+}
+
+/* ▼ タグクリック解除 */
+function removeGenre(g) {
+    document.querySelectorAll(`input[value="${g}"]`).forEach(i => i.checked = false);
+    updateSelectedGenres();
+}
+
+/* ▼ 追加 or 保存 */
+async function addOrSave() {
+    const url = document.getElementById("url").value;
+    const author = document.getElementById("author").value;
+    const checkedGenres = [...document.querySelectorAll("input[type=checkbox]:checked")].map(i => i.value);
+
+    if (!url || !author || checkedGenres.length === 0) {
+        alert("URL・投稿者名・ジャンルは必須です");
+        return;
+    }
+
+    const title = await fetchTitle(url);
+
+    if (editIndex !== null) {
+        posts[editIndex] = { ...posts[editIndex], url, author, genres: checkedGenres, title };
+        editIndex = null;
+        document.getElementById("mainBtn").textContent = "追加";
+        document.getElementById("cancelBtn").style.display = "none";
+        document.getElementById("formArea").classList.remove("editing");
+    } else {
+        posts.unshift({ url, author, genres: checkedGenres, time: Date.now(), favorite: false, title });
+    }
+
+    localStorage.setItem("posts", JSON.stringify(posts));
+    clearForm();
+    renderPosts();
+}
+
+/* ▼ 編集開始 */
+function editPost(index) {
+    const p = posts[index];
+
+    document.getElementById("url").value = p.url;
+    document.getElementById("author").value = p.author;
+
+    document.querySelectorAll("input[type=checkbox]").forEach(i => {
+        i.checked = p.genres.includes(i.value);
+    });
+    updateSelectedGenres();
+
+    editIndex = index;
+    document.getElementById("mainBtn").textContent = "保存";
+    document.getElementById("cancelBtn").style.display = "block";
+    document.getElementById("formArea").classList.add("editing");
+}
+
+/* ▼ 編集キャンセル */
+function cancelEdit() {
+    editIndex = null;
+    clearForm();
+    document.getElementById("mainBtn").textContent = "追加";
+    document.getElementById("cancelBtn").style.display = "none";
+    document.getElementById("formArea").classList.remove("editing");
+}
+
+/* ▼ フォームクリア */
+function clearForm() {
+    document.getElementById("url").value = "";
+    document.getElementById("author").value = "";
+    document.querySelectorAll("input[type=checkbox]").forEach(i => i.checked = false);
+    updateSelectedGenres();
+}
+
+/* ▼ 削除 */
+function deletePost(index) {
+    posts.splice(index, 1);
+    localStorage.setItem("posts", JSON.stringify(posts));
+    renderPosts();
+}
+
+/* ▼ お気に入り切り替え */
+function toggleFavorite(index) {
+    posts[index].favorite = !posts[index].favorite;
+    localStorage.setItem("posts", JSON.stringify(posts));
+    renderPosts();
+}
+
+/* ▼ 投稿表示（ページネーション対応） */
+function renderPosts() {
+    const list = document.getElementById("postList");
+    list.innerHTML = "";
+
+    const fAuthor = document.getElementById("filterAuthor").value;
+    const fGenre = document.getElementById("filterGenre").value;
+    const fFav = document.getElementById("filterFav").checked;
+
+    let filtered = posts
+        .map((p, i) => ({...p, index: i}))
+        .filter(p => !fAuthor || p.author.includes(fAuthor))
+        .filter(p => !fGenre || p.genres.includes(fGenre))
+        .filter(p => !fFav || p.favorite);
+
+    const totalPages = Math.ceil(filtered.length / perPage);
+    if (currentPage > totalPages) currentPage = totalPages || 1;
+
+    const start = (currentPage - 1) * perPage;
+    const pageItems = filtered.slice(start, start + perPage);
+
+    pageItems.forEach(p => {
+        const star = p.favorite ? "⭐" : "☆";
+
+        list.innerHTML += `
+            <div class="post">
+                <button class="action-btn fav-btn" onclick="toggleFavorite(${p.index})">${star}</button>
+                <button class="action-btn edit-btn" onclick="editPost(${p.index})">✏️</button>
+                <button class="action-btn delete-btn" onclick="deletePost(${p.index})">🗑</button>
+
+                ${p.title ? `<div><strong>${p.title}</strong></div>` : ""}
+                <a href="${p.url}" target="_blank">${p.url}</a><br>
+                <strong>${p.author}</strong><br>
+                <small>${p.genres.join(" / ")}</small>
+            </div>
+        `;
+    });
+
+    renderPagination(totalPages);
+}
+
+/* ▼ ページネーション */
+function renderPagination(total) {
+    const pag = document.getElementById("pagination");
+    pag.innerHTML = "";
+
+    if (total <= 1) return;
+
+    pag.innerHTML += `<button onclick="goPage(1)">≪</button>`;
+    pag.innerHTML += `<button onclick="goPage(currentPage-1)"><</button>`;
+
+    for (let i = 1; i <= total; i++) {
+        pag.innerHTML += `<button onclick="goPage(${i})" ${i===currentPage?'style="font-weight:bold;"':''}>${i}</button>`;
+    }
+
+    pag.innerHTML += `<button onclick="goPage(currentPage+1)">></button>`;
+    pag.innerHTML += `<button onclick="goPage(${total})">≫</button>`;
+}
+
+function goPage(n) {
+    const total = Math.ceil(posts.length / perPage);
+    if (n < 1 || n > total) return;
+    currentPage = n;
+    renderPosts();
+}
+
+renderPosts();
+</script>
+
+</body>
+</html>
