@@ -241,6 +241,12 @@ body {
     background: #66cc66;
    }
 
+   /* ▼ 検索ハイライト */
+.highlight {
+    background: #ffeaa7;
+    border-radius: 4px;
+}
+
 }
 </style>
 </head>
@@ -401,7 +407,7 @@ const genreGroups = {
   "わ行": ["わからせ"]
 };
 
-let posts = JSON.parse(localStorage.getItem("posts")) || [];
+let posts = [];
 let editIndex = null;
 let currentPage = 1;
 const perPage = 10;
@@ -415,48 +421,6 @@ async function fetchTitle(url) {
         return data.title;
     } catch {
         return null;
-    }
-}
-
-function searchGenres() {
-    const word = document.getElementById("genreSearch").value.trim();
-
-    // 全部閉じる
-    document.querySelectorAll(".genre-box").forEach(box => {
-        box.classList.remove("open");
-        box.querySelectorAll("label").forEach(l => l.classList.remove("highlight"));
-    });
-
-    // 行ボタンをリセット（新UI対応）
-    document.querySelectorAll(".row-button").forEach(btn => {
-        const row = btn.dataset.row;
-        btn.querySelector(".label").textContent = row;
-        btn.querySelector(".icon").textContent = "▶";
-        btn.classList.remove("open");
-    });
-
-    if (word === "") return;
-
-    // 検索
-    for (const row in genreGroups) {
-        const id = "box_" + row;
-        const box = document.getElementById(id);
-        const btn = document.querySelector(`.row-button[data-row="${row}"]`);
-
-        let hit = false;
-
-        box.querySelectorAll("label").forEach(label => {
-            if (label.textContent.includes(word)) {
-                label.classList.add("highlight");
-                hit = true;
-            }
-        });
-
-        if (hit) {
-            box.classList.add("open");
-            btn.classList.add("open");
-            btn.querySelector(".icon").textContent = "▼";
-        }
     }
 }
 
@@ -519,19 +483,21 @@ function toggleGenre(id, row) {
         icon.textContent = "▼";
     }
 }
-   
+
 function searchGenres() {
     const word = document.getElementById("genreSearch").value.trim();
 
+    // 全部閉じる
     document.querySelectorAll(".genre-box").forEach(box => {
         box.classList.remove("open");
         box.querySelectorAll("label").forEach(l => l.classList.remove("highlight"));
     });
+
     document.querySelectorAll(".row-button").forEach(btn => {
         const row = btn.dataset.row;
-       btn.querySelector(".label").textContent = row;
-       btn.querySelector(".icon").textContent = "▶";
-
+        btn.querySelector(".label").textContent = row;
+        btn.querySelector(".icon").textContent = "▶";
+        btn.classList.remove("open");
     });
 
     if (word === "") return;
@@ -552,7 +518,8 @@ function searchGenres() {
 
         if (hit) {
             box.classList.add("open");
-            btn.textContent = "▼ " + row;
+            btn.classList.add("open");
+            btn.querySelector(".icon").textContent = "▼";
         }
     }
 }
@@ -568,8 +535,7 @@ function removeGenre(g) {
     updateSelectedGenres();
 }
 
-async function addOrSave() {
-    editIndex = null;
+let posts = 
     const url = document.getElementById("url").value;
     const author = document.getElementById("author").value;
     const checkedGenres = [...document.querySelectorAll("input[type=checkbox]:checked")].map(i => i.value);
@@ -582,14 +548,19 @@ async function addOrSave() {
     const title = await fetchTitle(url);
 
     if (editIndex !== null) {
+        // 編集モード
         posts[editIndex] = { ...posts[editIndex], url, author, genres: checkedGenres, title };
-        editIndex = null;
-        document.getElementById("mainBtn").textContent = "追加";
-        document.getElementById("cancelBtn").style.display = "none";
-        document.getElementById("formArea").classList.remove("editing");
     } else {
+        // 新規追加
         posts.unshift({ url, author, genres: checkedGenres, time: Date.now(), favorite: false, title });
     }
+
+    // ← 正しい位置
+    editIndex = null;
+
+    document.getElementById("mainBtn").textContent = "追加";
+    document.getElementById("cancelBtn").style.display = "none";
+    document.getElementById("formArea").classList.remove("editing");
 
     await saveToCloud();
     clearForm();
