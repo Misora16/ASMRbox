@@ -535,7 +535,7 @@ function removeGenre(g) {
     updateSelectedGenres();
 }
 
-let posts = 
+async function addOrSave() {
     const url = document.getElementById("url").value;
     const author = document.getElementById("author").value;
     const checkedGenres = [...document.querySelectorAll("input[type=checkbox]:checked")].map(i => i.value);
@@ -555,7 +555,6 @@ let posts =
         posts.unshift({ url, author, genres: checkedGenres, time: Date.now(), favorite: false, title });
     }
 
-    // ← 正しい位置
     editIndex = null;
 
     document.getElementById("mainBtn").textContent = "追加";
