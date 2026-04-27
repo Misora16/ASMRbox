@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ASMRbox</title>
-
 <style>
 /* =========================
    PC 共通デザイン
@@ -95,17 +94,12 @@ body {
     border-radius: 8px;
 }
 
-/* ▼ 検索ハイライト */
-.highlight {
-    background: #ffeaa7;
-    border-radius: 4px;
-}
-
 /* =========================
    スマホ最適化（幅600px以下）
 ========================= */
 @media (max-width: 600px) {
 
+    /* 画面全体をスマホ幅に最適化 */
     body {
         margin: 0;
         padding: 0;
@@ -118,6 +112,14 @@ body {
         box-sizing: border-box;
     }
 
+    /* ▼ ログイン画面を縦長1列に */
+    #loginArea {
+        width: 100%;
+        max-width: 360px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
     #loginArea input,
     #loginArea button {
         display: block;
@@ -128,36 +130,46 @@ body {
         box-sizing: border-box;
     }
 
+    /* ▼ 行ボタンを1列に */
     .row-grid {
         grid-template-columns: 1fr;
         gap: 10px;
     }
+   
+   /* ▼ 行ボタン（スマホでも押しやすいデザイン） */
+   .row-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: #f0f4ff;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    border: 1px solid #d0d8ff;
+    transition: background 0.2s, transform 0.1s;
+   }
+   
+   /* 押したときの反応 */
+   .row-button:active {
+    background: #dce6ff;
+    transform: scale(0.98);
+   }
+   
+   /* 開いている行の強調 */
+   .row-button.open {
+    background: #d6e4ff;
+    border-color: #8aa8ff;
+    font-weight: bold;
+   }
+   
+   /* アイコン部分（▶/▼） */
+   .row-button .icon {
+    font-size: 20px;
+   }
 
-    .row-button {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 14px 16px;
-        background: #f0f4ff;
-        border-radius: 8px;
-        font-size: 18px;
-        cursor: pointer;
-        border: 1px solid #d0d8ff;
-        transition: background 0.2s, transform 0.1s;
-    }
-    .row-button:active {
-        background: #dce6ff;
-        transform: scale(0.98);
-    }
-    .row-button.open {
-        background: #d6e4ff;
-        border-color: #8aa8ff;
-        font-weight: bold;
-    }
-    .row-button .icon {
-        font-size: 20px;
-    }
 
+    /* ▼ ジャンル欄を1列に */
     .genre-box label {
         width: 100%;
         display: block;
@@ -165,6 +177,7 @@ body {
         font-size: 16px;
     }
 
+    /* ▼ 投稿カードのスマホ最適化 */
     .post {
         padding: 12px;
         font-size: 16px;
@@ -175,6 +188,7 @@ body {
         font-size: 16px;
     }
 
+    /* ▼ アクションボタンをタイトル上に横並び */
     .action-area {
         display: flex;
         flex-direction: row;
@@ -190,6 +204,7 @@ body {
         font-size: 18px;
     }
 
+    /* ▼ フィルター欄 */
     .filter-area input,
     .filter-area select {
         width: 100%;
@@ -198,95 +213,84 @@ body {
         margin-bottom: 10px;
     }
 
+    /* ▼ ページネーション */
     .pagination button {
         padding: 10px 14px;
         font-size: 16px;
     }
-
-    #addGenreBtn,
-    #mainBtn,
-    #cancelBtn {
-        width: 100%;
-        padding: 14px 0;
-        font-size: 20px;
-        border-radius: 10px;
-        margin-bottom: 12px;
-        background: #4da3ff;
-        color: white;
-        border: none;
-    }
-    #cancelBtn { background: #ff6666; }
-    #addGenreBtn { background: #66cc66; }
 }
 </style>
+</head>
+<body>
 
-<link rel="icon" href="ASMRbox_favicon.png" type="image/png">
+<!-- ======== ASMRbox 全体コンテナ ======== -->
+<div class="container">
 
-<!-- ★ Firebase SDK（正しい位置） -->
+    <!-- ======== ログイン画面 ======== -->
+    <div id="loginArea" class="login-area" style="display:none;">
+      <h2>ログイン</h2>
+      <input id="loginEmail" placeholder="メールアドレス">
+      <input id="loginPass" type="password" placeholder="パスワード">
+      <button onclick="login()">ログイン</button>
+      <button onclick="signup()">新規登録</button>
+    </div>
+
+    <!-- ======== ASMRbox 本体 ======== -->
+    <div id="appArea" style="display:none;">
+
+        <button onclick="logout()">ログアウト</button>
+
+        <h2>ASMRbox</h2>
+
+        <h3>新規追加 / 編集</h3>
+        <div id="formArea">
+            <input id="url" placeholder="URL">
+            <input id="author" placeholder="投稿者名">
+
+            <h4>ジャンル（行を押して展開）</h4>
+
+            <input id="genreSearch" placeholder="ジャンル検索" oninput="searchGenres()">
+
+            <div id="selectedGenres" class="selected-tags"></div>
+
+            <div id="rowButtons" class="row-grid"></div>
+            <div id="genreContainer"></div>
+
+            <button id="mainBtn" onclick="addOrSave()">追加</button>
+            <button id="cancelBtn" style="display:none;" onclick="cancelEdit()">キャンセル</button>
+        </div>
+
+        <hr>
+
+        <div class="filter-area">
+            <h3>絞り込み</h3>
+            <input id="filterAuthor" placeholder="投稿者名で絞り込み" oninput="renderPosts()">
+            <select id="filterGenre" onchange="renderPosts()">
+                <option value="">ジャンル指定なし</option>
+            </select>
+
+            <label>
+                <input type="checkbox" id="filterFav" onchange="renderPosts()">
+                お気に入りのみ
+            </label>
+        </div>
+
+        <h3>投稿一覧</h3>
+        <div id="postList"></div>
+        <div id="pagination" class="pagination"></div>
+
+    </div>
+
+</div>
+
+<!-- ======== Firebase SDK ======== -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-</head>
-
-<body>
-
-<div class="container">
-
-<!-- ▼ ログイン画面 -->
-<div id="loginArea">
-    <h2>ログイン / 新規登録</h2>
-    <input id="loginEmail" type="email" placeholder="メールアドレス">
-    <input id="loginPass" type="password" placeholder="パスワード">
-    <button onclick="login()">ログイン</button>
-    <button onclick="signup()">新規登録</button>
-</div>
-
-<!-- ▼ アプリ本体 -->
-<div id="appArea" style="display:none;">
-
-    <button onclick="logout()">ログアウト</button>
-
-    <h2>ASMRbox</h2>
-
-    <!-- ▼ 投稿フォーム -->
-    <div id="formArea">
-        <input id="url" type="text" placeholder="URL">
-        <input id="author" type="text" placeholder="投稿者名">
-
-        <div class="selected-tags" id="selectedGenres"></div>
-
-        <div class="row-grid" id="rowButtons"></div>
-        <div id="genreContainer"></div>
-
-        <button id="mainBtn" onclick="addOrSave()">追加</button>
-        <button id="cancelBtn" onclick="cancelEdit()" style="display:none;">キャンセル</button>
-    </div>
-
-    <!-- ▼ 絞り込み -->
-    <div class="filter-area">
-        <input id="filterAuthor" type="text" placeholder="投稿者名で絞り込み" oninput="renderPosts()">
-        <select id="filterGenre" onchange="renderPosts()">
-            <option value="">ジャンル指定なし</option>
-        </select>
-        <label>
-            <input id="filterFav" type="checkbox" onchange="renderPosts()"> ★お気に入りのみ
-        </label>
-    </div>
-
-    <!-- ▼ 投稿一覧 -->
-    <div id="postList"></div>
-
-    <!-- ▼ ページネーション -->
-    <div id="pagination" class="pagination"></div>
-
-</div>
-
-<!-- ▼ JavaScript（Firebase 初期化 + ASMRbox 全機能） -->
+<!-- ======== すべての JS を 1 つの script に統合 ======== -->
 <script>
-/* =========================
-   Firebase 設定
-========================= */
+/* ======== Firebase 設定 ======== */
 const firebaseConfig = {
   apiKey: "AIzaSyAPSv0fSvoMNPw5Ua95JJjY2pppwwMqcsY",
   authDomain: "asmrbox-69b3a.firebaseapp.com",
@@ -301,9 +305,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-/* =========================
-   Firestore 読み込み
-========================= */
+/* ======== Firestore 読み込み ======== */
 async function loadFromCloud() {
     if (!auth.currentUser) return;
 
@@ -315,9 +317,7 @@ async function loadFromCloud() {
     renderPosts();
 }
 
-/* =========================
-   Firestore 保存
-========================= */
+/* ======== Firestore 保存 ======== */
 async function saveToCloud() {
     if (!auth.currentUser) return;
 
@@ -325,10 +325,8 @@ async function saveToCloud() {
         .doc(auth.currentUser.uid)
         .set({ posts });
 }
-
-/* =========================
-   ログイン制御
-========================= */
+    
+/* ======== ログイン制御 ======== */
 function showLogin() {
     document.getElementById("loginArea").style.display = "block";
     document.getElementById("appArea").style.display = "none";
@@ -342,7 +340,7 @@ auth.onAuthStateChanged(async user => {
     if (user) {
         showApp();
         loadGenres();
-        await loadFromCloud();
+        await loadFromCloud();   // ← これが絶対必要
     } else {
         showLogin();
     }
@@ -366,13 +364,11 @@ function logout() {
     auth.signOut();
 }
 
-/* =========================
-   データ構造
-========================= */
+/* ======== ASMRbox 本体の JS ======== */
 const genreGroups = {
   "あ行": ["愛重め","煽り","姉","甘々","甘やかし","甘サド","R-15","R-18","イケボ","いちゃいちゃ","犬系","妹","幼馴染","お姉さん"],
   "か行": ["彼女","カワボ","環境音","監禁","看病","企業","義姉","義妹","衣擦れ音","共依存","KU100","高速耳かき","後輩","声なし","コラボ"],
-  "さ行": ["作業用","囁き","雑談","シチュボ","実写","シャンプー","女性向け","女性優位","ショタボ","心音","人外","睡眠導入","好き攻め","スライム","清楚","声優","全肯定","全年齢","先輩","全否定","添い寝"],
+  "さ行": ["作業用","囁き","雑談","シチュボ","実写","シャンプー","女性向け","女性優位","ショタボ","心音","人外","睡眠導入","好き攻め","スライム","声優","全肯定","全年齢","先輩","全否定","添い寝"],
   "た行": ["胎内回帰","タイピング","ダウナー","タオルドライ","タッピング","男性向け","Dom/sub","妻","ツンデレ","低音","貞操逆転","TS","吐息","動画","動物","ドS","ドM","年上","年下"],
   "な行": ["撫で","撫で音","認知シャッフル","寝息","寝かしつけ","のじゃロリ"],
   "は行": ["ハグ","ハスキー","罵倒","ハムボ","膝枕","VTuber","ヘアカット","ペット扱い","ボーイッシュ","僕っ子","梵天","VOICELOID"],
@@ -382,82 +378,43 @@ const genreGroups = {
   "わ行": ["わからせ"]
 };
 
-let posts = [];
+let posts = JSON.parse(localStorage.getItem("posts")) || [];
 let editIndex = null;
 let currentPage = 1;
 const perPage = 10;
-
-/* =========================
-   ジャンル UI
-========================= */
-function loadGenres() {
-    const rowButtons = document.getElementById("rowButtons");
-    const genreContainer = document.getElementById("genreContainer");
-    const filter = document.getElementById("filterGenre");
-
-    rowButtons.innerHTML = "";
-    genreContainer.innerHTML = "";
-    filter.innerHTML = `<option value="">ジャンル指定なし</option>`;
-
-    for (const row in genreGroups) {
-        const id = "box_" + row;
-
-        rowButtons.innerHTML += `
-            <div class="row-button" data-row="${row}" onclick="toggleGenre('${id}', '${row}')">
-                <span class="label">${row}</span>
-                <span class="icon">▶</span>
-            </div>
-        `;
-
-        genreContainer.innerHTML += `
-            <div class="genre-box" id="${id}">
-                ${genreGroups[row].map(g =>
-                    `<label><input type="checkbox" value="${g}" onchange="updateSelectedGenres()">${g}</label>`
-                ).join("")}
-            </div>
-        `;
-
-        genreGroups[row].forEach(g => {
-            filter.innerHTML += `<option value="${g}">${g}</option>`;
-        });
-    }
-}
-
-function toggleGenre(id, row) {
-    const box = document.getElementById(id);
-    const btn = document.querySelector(`.row-button[data-row="${row}"]`);
-    const icon = btn.querySelector(".icon");
-
-    const isOpen = box.classList.contains("open");
-
-    document.querySelectorAll(".genre-box").forEach(b => b.classList.remove("open"));
-    document.querySelectorAll(".row-button").forEach(b => {
-        b.classList.remove("open");
-        b.querySelector(".icon").textContent = "▶";
-    });
-
-    if (!isOpen) {
-        box.classList.add("open");
-        btn.classList.add("open");
-        icon.textContent = "▼";
+    
+/* ▼ 以下、ASMRbox の機能 */
+async function fetchTitle(url) {
+    try {
+        const res = await fetch(`https://www.youtube.com/oembed?url=${url}&format=json`);
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data.title;
+    } catch {
+        return null;
     }
 }
 
 function searchGenres() {
     const word = document.getElementById("genreSearch").value.trim();
 
+    // 全部閉じる
     document.querySelectorAll(".genre-box").forEach(box => {
         box.classList.remove("open");
         box.querySelectorAll("label").forEach(l => l.classList.remove("highlight"));
     });
 
+    // 行ボタンをリセット（新UI対応）
     document.querySelectorAll(".row-button").forEach(btn => {
-        btn.classList.remove("open");
+        const row = btn.dataset.row;
+        btn.querySelector(".label").textContent = row;
         btn.querySelector(".icon").textContent = "▶";
+        btn.classList.remove("open");
     });
 
     if (word === "") return;
 
+    // 検索
     for (const row in genreGroups) {
         const id = "box_" + row;
         const box = document.getElementById(id);
@@ -480,6 +437,103 @@ function searchGenres() {
     }
 }
 
+function loadGenres() {
+    const rowButtons = document.getElementById("rowButtons");
+    const genreContainer = document.getElementById("genreContainer");
+    const filter = document.getElementById("filterGenre");
+
+    // 初期化
+    rowButtons.innerHTML = "";
+    genreContainer.innerHTML = "";
+    filter.innerHTML = `<option value="">ジャンル指定なし</option>`;
+
+    // 行ごとに生成
+    for (const row in genreGroups) {
+        const id = "box_" + row;
+
+        // 行ボタン（アイコン右側）
+        rowButtons.innerHTML += `
+            <div class="row-button" data-row="${row}" onclick="toggleGenre('${id}', '${row}')">
+                <span class="label">${row}</span>
+                <span class="icon">▶</span>
+            </div>
+        `;
+
+        // ジャンル一覧
+        genreContainer.innerHTML += `
+            <div class="genre-box" id="${id}">
+                ${genreGroups[row].map(g =>
+                    `<label><input type="checkbox" value="${g}" onchange="updateSelectedGenres()">${g}</label>`
+                ).join("")}
+            </div>
+        `;
+
+        // 絞り込み用
+        genreGroups[row].forEach(g => {
+            filter.innerHTML += `<option value="${g}">${g}</option>`;
+        });
+    }
+}
+
+function toggleGenre(id, row) {
+    const box = document.getElementById(id);
+    const btn = document.querySelector(`.row-button[data-row="${row}"]`);
+    const icon = btn.querySelector(".icon");
+
+    const isOpen = box.classList.contains("open");
+
+    // 全部閉じる
+    document.querySelectorAll(".genre-box").forEach(b => b.classList.remove("open"));
+    document.querySelectorAll(".row-button").forEach(b => {
+        b.classList.remove("open");
+        b.querySelector(".icon").textContent = "▶";
+    });
+
+    // 今押した行だけ開く
+    if (!isOpen) {
+        box.classList.add("open");
+        btn.classList.add("open");
+        icon.textContent = "▼";
+    }
+}
+   
+function searchGenres() {
+    const word = document.getElementById("genreSearch").value.trim();
+
+    document.querySelectorAll(".genre-box").forEach(box => {
+        box.classList.remove("open");
+        box.querySelectorAll("label").forEach(l => l.classList.remove("highlight"));
+    });
+    document.querySelectorAll(".row-button").forEach(btn => {
+        const row = btn.dataset.row;
+       btn.querySelector(".label").textContent = row;
+       btn.querySelector(".icon").textContent = "▶";
+
+    });
+
+    if (word === "") return;
+
+    for (const row in genreGroups) {
+        const id = "box_" + row;
+        const box = document.getElementById(id);
+        const btn = document.querySelector(`.row-button[data-row="${row}"]`);
+
+        let hit = false;
+
+        box.querySelectorAll("label").forEach(label => {
+            if (label.textContent.includes(word)) {
+                label.classList.add("highlight");
+                hit = true;
+            }
+        });
+
+        if (hit) {
+            box.classList.add("open");
+            btn.textContent = "▼ " + row;
+        }
+    }
+}
+
 function updateSelectedGenres() {
     const selected = [...document.querySelectorAll("input[type=checkbox]:checked")].map(i => i.value);
     document.getElementById("selectedGenres").innerHTML =
@@ -491,10 +545,8 @@ function removeGenre(g) {
     updateSelectedGenres();
 }
 
-/* =========================
-   投稿追加・編集
-========================= */
 async function addOrSave() {
+    editIndex = null;
     const url = document.getElementById("url").value;
     const author = document.getElementById("author").value;
     const checkedGenres = [...document.querySelectorAll("input[type=checkbox]:checked")].map(i => i.value);
@@ -508,22 +560,13 @@ async function addOrSave() {
 
     if (editIndex !== null) {
         posts[editIndex] = { ...posts[editIndex], url, author, genres: checkedGenres, title };
+        editIndex = null;
+        document.getElementById("mainBtn").textContent = "追加";
+        document.getElementById("cancelBtn").style.display = "none";
+        document.getElementById("formArea").classList.remove("editing");
     } else {
-        posts.unshift({
-            url,
-            author,
-            genres: checkedGenres,
-            time: Date.now(),
-            favorite: false,
-            title
-        });
+        posts.unshift({ url, author, genres: checkedGenres, time: Date.now(), favorite: false, title });
     }
-
-    editIndex = null;
-
-    document.getElementById("mainBtn").textContent = "追加";
-    document.getElementById("cancelBtn").style.display = "none";
-    document.getElementById("formArea").classList.remove("editing");
 
     await saveToCloud();
     clearForm();
@@ -562,9 +605,6 @@ function clearForm() {
     updateSelectedGenres();
 }
 
-/* =========================
-   投稿削除・お気に入り
-========================= */
 async function deletePost(index) {
     posts.splice(index, 1);
     await saveToCloud();
@@ -575,12 +615,10 @@ async function deletePost(index) {
 async function toggleFavorite(index) {
     posts[index].favorite = !posts[index].favorite;
     await saveToCloud();
+    clearForm();
     renderPosts();
 }
 
-/* =========================
-   投稿表示
-========================= */
 function renderPosts() {
     const list = document.getElementById("postList");
     list.innerHTML = "";
@@ -590,7 +628,7 @@ function renderPosts() {
     const fFav = document.getElementById("filterFav").checked;
 
     let filtered = posts
-        .map((p, i) => ({ ...p, index: i }))
+        .map((p, i) => ({...p, index: i}))
         .filter(p => !fAuthor || p.author.includes(fAuthor))
         .filter(p => !fGenre || p.genres.includes(fGenre))
         .filter(p => !fFav || p.favorite);
@@ -623,9 +661,6 @@ function renderPosts() {
     renderPagination(totalPages);
 }
 
-/* =========================
-   ページネーション
-========================= */
 function renderPagination(total) {
     const pag = document.getElementById("pagination");
     pag.innerHTML = "";
@@ -633,13 +668,13 @@ function renderPagination(total) {
     if (total <= 1) return;
 
     pag.innerHTML += `<button onclick="goPage(1)">≪</button>`;
-    pag.innerHTML += `<button onclick="goPage(currentPage - 1)"><</button>`;
+    pag.innerHTML += `<button onclick="goPage(currentPage-1)"><</button>`;
 
     for (let i = 1; i <= total; i++) {
-        pag.innerHTML += `<button onclick="goPage(${i})" ${i === currentPage ? 'style="font-weight:bold;"' : ''}>${i}</button>`;
+        pag.innerHTML += `<button onclick="goPage(${i})" ${i===currentPage?'style="font-weight:bold;"':''}>${i}</button>`;
     }
 
-    pag.innerHTML += `<button onclick="goPage(currentPage + 1)">></button>`;
+    pag.innerHTML += `<button onclick="goPage(currentPage+1)">></button>`;
     pag.innerHTML += `<button onclick="goPage(${total})">≫</button>`;
 }
 
