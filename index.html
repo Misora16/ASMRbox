@@ -497,43 +497,6 @@ function toggleGenre(id, row) {
     }
 }
    
-function searchGenres() {
-    const word = document.getElementById("genreSearch").value.trim();
-
-    document.querySelectorAll(".genre-box").forEach(box => {
-        box.classList.remove("open");
-        box.querySelectorAll("label").forEach(l => l.classList.remove("highlight"));
-    });
-    document.querySelectorAll(".row-button").forEach(btn => {
-        const row = btn.dataset.row;
-       btn.querySelector(".label").textContent = row;
-       btn.querySelector(".icon").textContent = "▶";
-
-    });
-
-    if (word === "") return;
-
-    for (const row in genreGroups) {
-        const id = "box_" + row;
-        const box = document.getElementById(id);
-        const btn = document.querySelector(`.row-button[data-row="${row}"]`);
-
-        let hit = false;
-
-        box.querySelectorAll("label").forEach(label => {
-            if (label.textContent.includes(word)) {
-                label.classList.add("highlight");
-                hit = true;
-            }
-        });
-
-        if (hit) {
-            box.classList.add("open");
-            btn.textContent = "▼ " + row;
-        }
-    }
-}
-
 function updateSelectedGenres() {
     const selected = [...document.querySelectorAll("input[type=checkbox]:checked")].map(i => i.value);
     document.getElementById("selectedGenres").innerHTML =
