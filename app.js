@@ -1,0 +1,355 @@
+/* ======== Firebase 設定 ======== */
+const firebaseConfig = {
+  apiKey: "AIzaSyAPSv0fSvoMNPw5Ua95JJjY2pppwwMqcsY",
+  authDomain: "asmrbox-69b3a.firebaseapp.com",
+  projectId: "asmrbox-69b3a",
+  storageBucket: "asmrbox-69b3a.firebasestorage.app",
+  messagingSenderId: "320429813177",
+  appId: "1:320429813177:web:64f47359ec47e9730a1a68",
+  measurementId: "G-47CSW3WD4N"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+/* ======== Firestore 読み込み ======== */
+async function loadFromCloud() {
+    if (!auth.currentUser) return;
+
+    const doc = await db.collection("users")
+        .doc(auth.currentUser.uid)
+        .get();
+
+    posts = doc.exists ? doc.data().posts : [];
+    renderPosts();
+}
+
+/* ======== Firestore 保存 ======== */
+async function saveToCloud() {
+    if (!auth.currentUser) return;
+
+    await db.collection("users")
+        .doc(auth.currentUser.uid)
+        .set({ posts });
+}
+    
+/* ======== ログイン制御 ======== */
+function showLogin() {
+    document.getElementById("loginArea").style.display = "block";
+    document.getElementById("appArea").style.display = "none";
+}
+function showApp() {
+    document.getElementById("loginArea").style.display = "none";
+    document.getElementById("appArea").style.display = "block";
+}
+
+auth.onAuthStateChanged(async user => {
+    if (user) {
+        showApp();
+        loadGenres();
+        await loadFromCloud();   // ← これが絶対必要
+    } else {
+        showLogin();
+    }
+});
+
+function login() {
+    const email = loginEmail.value;
+    const pass = loginPass.value;
+    auth.signInWithEmailAndPassword(email, pass)
+        .catch(e => alert("ログイン失敗: " + e.message));
+}
+
+function signup() {
+    const email = loginEmail.value;
+    const pass = loginPass.value;
+    auth.createUserWithEmailAndPassword(email, pass)
+        .catch(e => alert("登録失敗: " + e.message));
+}
+
+function logout() {
+    auth.signOut();
+}
+
+/* ======== ASMRbox 本体の JS ======== */
+const genreGroups = {
+  "あ行": ["愛重め","煽り","姉","甘々","甘やかし","甘サド","R-15","R-18","イケボ","いちゃいちゃ","犬系","妹","幼馴染","お姉さん"],
+  "か行": ["彼女","カワボ","環境音","監禁","看病","企業","義姉","義妹","衣擦れ音","共依存","KU100","高速耳かき","後輩","声なし","コラボ"],
+  "さ行": ["作業用","囁き","雑談","シチュボ","実写","シャンプー","女性向け","女性優位","ショタボ","心音","人外","睡眠導入","好き攻め","スライム","声優","全肯定","全年齢","先輩","全否定","添い寝"],
+  "た行": ["胎内回帰","タイピング","ダウナー","タオルドライ","タッピング","男性向け","Dom/sub","妻","ツンデレ","低音","貞操逆転","TS","吐息","動画","動物","ドS","ドM","年上","年下"],
+  "な行": ["撫で","撫で音","認知シャッフル","寝息","寝かしつけ","のじゃロリ"],
+  "は行": ["ハグ","ハスキー","罵倒","ハムボ","膝枕","VTuber","ヘアカット","ペット扱い","ボーイッシュ","僕っ子","梵天","VOICELOID"],
+  "ま行": ["マッサージ","ママ","耳かき","耳舐め","耳ふさぎ","メンヘラ"],
+  "や行": ["ヤンデレ","百合","有名人"],
+  "ら行": ["ライブ配信","リップ音","両耳同時","ロリボ","RP"],
+  "わ行": ["わからせ"]
+};
+
+let posts = JSON.parse(localStorage.getItem("posts")) || [];
+let editIndex = null;
+let currentPage = 1;
+const perPage = 10;
+    
+/* ▼ 以下、ASMRbox の機能 */
+async function fetchTitle(url) {
+    try {
+        const res = await fetch(`https://www.youtube.com/oembed?url=${url}&format=json`);
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data.title;
+    } catch {
+        return null;
+    }
+}
+
+function searchGenres() {
+    const word = document.getElementById("genreSearch").value.trim();
+
+    // 全部閉じる
+    document.querySelectorAll(".genre-box").forEach(box => {
+        box.classList.remove("open");
+        box.querySelectorAll("label").forEach(l => l.classList.remove("highlight"));
+    });
+
+    // 行ボタンをリセット（新UI対応）
+    document.querySelectorAll(".row-button").forEach(btn => {
+        const row = btn.dataset.row;
+        btn.querySelector(".label").textContent = row;
+        btn.querySelector(".icon").textContent = "▶";
+        btn.classList.remove("open");
+    });
+
+    if (word === "") return;
+
+    // 検索
+    for (const row in genreGroups) {
+        const id = "box_" + row;
+        const box = document.getElementById(id);
+        const btn = document.querySelector(`.row-button[data-row="${row}"]`);
+
+        let hit = false;
+
+        box.querySelectorAll("label").forEach(label => {
+            if (label.textContent.includes(word)) {
+                label.classList.add("highlight");
+                hit = true;
+            }
+        });
+
+        if (hit) {
+            box.classList.add("open");
+            btn.classList.add("open");
+            btn.querySelector(".icon").textContent = "▼";
+        }
+    }
+}
+
+function loadGenres() {
+    const rowButtons = document.getElementById("rowButtons");
+    const genreContainer = document.getElementById("genreContainer");
+    const filter = document.getElementById("filterGenre");
+
+    // 初期化
+    rowButtons.innerHTML = "";
+    genreContainer.innerHTML = "";
+    filter.innerHTML = `<option value="">ジャンル指定なし</option>`;
+
+    // 行ごとに生成
+    for (const row in genreGroups) {
+        const id = "box_" + row;
+
+        // 行ボタン（アイコン右側）
+        rowButtons.innerHTML += `
+            <div class="row-button" data-row="${row}" onclick="toggleGenre('${id}', '${row}')">
+                <span class="label">${row}</span>
+                <span class="icon">▶</span>
+            </div>
+        `;
+
+        // ジャンル一覧
+        genreContainer.innerHTML += `
+            <div class="genre-box" id="${id}">
+                ${genreGroups[row].map(g =>
+                    `<label><input type="checkbox" value="${g}" onchange="updateSelectedGenres()">${g}</label>`
+                ).join("")}
+            </div>
+        `;
+
+        // 絞り込み用
+        genreGroups[row].forEach(g => {
+            filter.innerHTML += `<option value="${g}">${g}</option>`;
+        });
+    }
+}
+
+function toggleGenre(id, row) {
+    const box = document.getElementById(id);
+    const btn = document.querySelector(`.row-button[data-row="${row}"]`);
+    const icon = btn.querySelector(".icon");
+
+    const isOpen = box.classList.contains("open");
+
+    // 全部閉じる
+    document.querySelectorAll(".genre-box").forEach(b => b.classList.remove("open"));
+    document.querySelectorAll(".row-button").forEach(b => {
+        b.classList.remove("open");
+        b.querySelector(".icon").textContent = "▶";
+    });
+
+    // 今押した行だけ開く
+    if (!isOpen) {
+        box.classList.add("open");
+        btn.classList.add("open");
+        icon.textContent = "▼";
+    }
+}
+   
+function updateSelectedGenres() {
+    const selected = [...document.querySelectorAll("input[type=checkbox]:checked")].map(i => i.value);
+    document.getElementById("selectedGenres").innerHTML =
+        selected.map(g => `<span class="tag" onclick="removeGenre('${g}')">${g}</span>`).join("");
+}
+
+function removeGenre(g) {
+    document.querySelectorAll(`input[value="${g}"]`).forEach(i => i.checked = false);
+    updateSelectedGenres();
+}
+
+async function addOrSave() {
+    editIndex = null;
+    const url = document.getElementById("url").value;
+    const author = document.getElementById("author").value;
+    const checkedGenres = [...document.querySelectorAll("input[type=checkbox]:checked")].map(i => i.value);
+
+    if (!url || !author || checkedGenres.length === 0) {
+        alert("URL・投稿者名・ジャンルは必須です");
+        return;
+    }
+
+    const title = await fetchTitle(url);
+
+    if (editIndex !== null) {
+        posts[editIndex] = { ...posts[editIndex], url, author, genres: checkedGenres, title };
+        editIndex = null;
+        document.getElementById("mainBtn").textContent = "追加";
+        document.getElementById("cancelBtn").style.display = "none";
+        document.getElementById("formArea").classList.remove("editing");
+    } else {
+        posts.unshift({ url, author, genres: checkedGenres, time: Date.now(), favorite: false, title });
+    }
+
+    await saveToCloud();
+    clearForm();
+    renderPosts();
+}
+
+function editPost(index) {
+    const p = posts[index];
+
+    document.getElementById("url").value = p.url;
+    document.getElementById("author").value = p.author;
+
+    document.querySelectorAll("input[type=checkbox]").forEach(i => {
+        i.checked = p.genres.includes(i.value);
+    });
+    updateSelectedGenres();
+
+    editIndex = index;
+    document.getElementById("mainBtn").textContent = "保存";
+    document.getElementById("cancelBtn").style.display = "block";
+    document.getElementById("formArea").classList.add("editing");
+}
+
+function cancelEdit() {
+    editIndex = null;
+    clearForm();
+    document.getElementById("mainBtn").textContent = "追加";
+    document.getElementById("cancelBtn").style.display = "none";
+    document.getElementById("formArea").classList.remove("editing");
+}
+
+function clearForm() {
+    document.getElementById("url").value = "";
+    document.getElementById("author").value = "";
+    document.querySelectorAll("input[type=checkbox]").forEach(i => i.checked = false);
+    updateSelectedGenres();
+}
+
+async function deletePost(index) {
+    posts.splice(index, 1);
+    await saveToCloud();
+    clearForm();
+    renderPosts();
+}
+
+async function toggleFavorite(index) {
+    posts[index].favorite = !posts[index].favorite;
+    await saveToCloud();
+    clearForm();
+    renderPosts();
+}
+
+function renderPosts() {
+    const list = document.getElementById("postList");
+    list.innerHTML = "";
+
+    const fAuthor = document.getElementById("filterAuthor").value;
+    const fGenre = document.getElementById("filterGenre").value;
+    const fFav = document.getElementById("filterFav").checked;
+
+    let filtered = posts
+        .map((p, i) => ({...p, index: i}))
+        .filter(p => !fAuthor || p.author.includes(fAuthor))
+        .filter(p => !fGenre || p.genres.includes(fGenre))
+        .filter(p => !fFav || p.favorite);
+
+    const totalPages = Math.ceil(filtered.length / perPage);
+    if (currentPage > totalPages) currentPage = totalPages || 1;
+
+    const start = (currentPage - 1) * perPage;
+    const pageItems = filtered.slice(start, start + perPage);
+
+    pageItems.forEach(p => {
+        const star = p.favorite ? "★" : "☆";
+
+        list.innerHTML += `
+            <div class="post">
+                <div class="action-area">
+                    <button class="action-btn fav-btn" onclick="toggleFavorite(${p.index})">${star}</button>
+                    <button class="action-btn edit-btn" onclick="editPost(${p.index})">✏️</button>
+                    <button class="action-btn delete-btn" onclick="deletePost(${p.index})">🗑</button>
+                </div>
+
+                ${p.title ? `<div><strong>${p.title}</strong></div>` : ""}
+                <a href="${p.url}" target="_blank">${p.url}</a><br>
+                <strong>${p.author}</strong><br>
+                <small>${p.genres.join(" / ")}</small>
+            </div>
+        `;
+    });
+
+    renderPagination(totalPages);
+}
+
+function renderPagination(total) {
+    const pag = document.getElementById("pagination");
+    pag.innerHTML = "";
+
+    if (total <= 1) return;
+
+    pag.innerHTML += `<button onclick="goPage(1)">≪</button>`;
+    pag.innerHTML += `<button onclick="goPage(currentPage-1)"><</button>`;
+
+    for (let i = 1; i <= total; i++) {
+        pag.innerHTML += `<button onclick="goPage(${i})" ${i===currentPage?'style="font-weight:bold;"':''}>${i}</button>`;
+    }
+
+    pag.innerHTML += `<button onclick="goPage(currentPage+1)">></button>`;
+    pag.innerHTML += `<button onclick="goPage(${total})">≫</button>`;
+}
+
+function goPage(num) {
+    currentPage = num;
+    renderPosts();
+}
